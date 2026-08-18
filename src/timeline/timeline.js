@@ -13,6 +13,18 @@ import { formatYear } from "../time/year.js";
 
 const CURSOR_HIT_RADIUS_PX = 4;
 
+/** True when two year ranges are the same to within a rounding error. */
+function sameRange([a, b], [c, d]) {
+  return Math.abs(a - c) < 1e-6 && Math.abs(b - d) < 1e-6;
+}
+
+/** Keep a range inside an extent, collapsing to the extent if it no longer fits. */
+function clamp([lo, hi], [min, max]) {
+  const start = Math.max(lo, min);
+  const end = Math.min(hi, max);
+  return end > start ? [start, end] : [min, max];
+}
+
 /**
  * @param {HTMLElement} container
  * @param {{height?: number, onCursor?: (info: {year: number, groups: Array}|null) => void,
@@ -23,7 +35,6 @@ export function createTimeline(container, options = {}) {
 
   const chart = createChart(container, options);
 
-  let allEvents = [];
   let visible = [];
   let windowed = [];
   let lanes = [];
@@ -187,15 +198,20 @@ export function createTimeline(container, options = {}) {
   return {
     /** Set the full corpus. Fixes the overall extent that the navi band shows. */
     setData(events) {
-      allEvents = events;
-      const [lo, hi] = extent(
-        allEvents.flatMap((event) => [event.start, eventEnd(event)]),
-      );
+      const [lo, hi] = extent(events.flatMap((event) => [event.start, eventEnd(event)]));
       const pad = Math.max(10, (hi - lo) * 0.01);
-      const domain = [lo - pad, hi + pad];
-      chart.naviScale.domain(domain);
-      chart.mainScale.domain(domain);
+      const full = [lo - pad, hi + pad];
+
+      // Switching a bulk layer on must not throw away the reader's zoom. Keep
+      // whatever range is in view, clamped into the new extent, and move the
+      // brush to match — a selection rect that disagrees with the detail band
+      // is worse than no selection at all.
+      const current = brushControl ? clamp(chart.mainScale.domain(), full) : null;
+
+      chart.naviScale.domain(full);
+      chart.mainScale.domain(current ?? full);
       if (!brushControl) attach();
+      else brushControl.setDomain(current && !sameRange(current, full) ? current : null);
     },
 
     /** Set the filtered subset that is actually drawn. */
@@ -216,10 +232,19 @@ export function createTimeline(container, options = {}) {
     },
 
     resize() {
+      // d3-brush stores its selection in pixels. Re-attaching against a new
+      // width leaves that rect denoting a different year range than the detail
+      // band is showing, so the domain is captured and repainted afterwards.
+      const domain = chart.mainScale.domain();
+      const full = chart.naviScale.domain();
+
       chart.resize();
+      attach();
+      chart.mainScale.domain(domain);
+      brushControl.setDomain(sameRange(domain, full) ? null : domain);
+
       rebuildLanes();
       renderNavi();
-      attach();
       chart.redraw();
     },
   };

@@ -100,6 +100,12 @@ browser.
   drag makes lanes jump under the pointer driving them.
 - **Curated events win id collisions.** `dedupeById` is first-wins and curated
   datasets load first, so a bulk layer can never double a hand-curated event.
+  `ingest-gvp.mjs` also skips eruptions already present in `nature.csv`, matched
+  on name and year, because ids from two independent sources will not collide on
+  their own.
+- **The loader trusts the header row, not the status code.** A dev server that
+  falls back to `index.html` answers 200 for a missing CSV, and the parser would
+  turn that HTML into hundreds of junk rows.
 
 ## Data
 

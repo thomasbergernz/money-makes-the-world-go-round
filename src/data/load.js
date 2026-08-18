@@ -1,7 +1,7 @@
 // Dataset loading: fetch CSV, normalise, merge, de-duplicate.
 
 import { csvParse } from "d3-dsv";
-import { normaliseDataset, dedupeById } from "./schema.js";
+import { normaliseDataset, dedupeById, REQUIRED_COLUMNS } from "./schema.js";
 
 /**
  * Load and normalise one dataset.
@@ -25,7 +25,16 @@ export async function loadDataset(dataset) {
 
   if (text.trim() === "") return { events: [], errors: [], missing: false };
 
-  const { events, errors } = normaliseDataset(csvParse(text), dataset.id);
+  // A dev server that falls back to index.html answers 200 for a file that is
+  // not there, and the CSV parser will happily turn that HTML into hundreds of
+  // junk rows. Trust the header row, not the status code.
+  const rows = csvParse(text);
+  const columns = rows.columns ?? [];
+  if (!REQUIRED_COLUMNS.every((column) => columns.includes(column))) {
+    return { events: [], errors: [], missing: true };
+  }
+
+  const { events, errors } = normaliseDataset(rows, dataset.id);
   return { events, errors, missing: false };
 }
 

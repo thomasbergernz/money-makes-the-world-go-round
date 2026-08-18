@@ -15,7 +15,7 @@
 // GVP data is published by the Smithsonian Institution. Cite it as
 // Global Volcanism Program, Volcanoes of the World, Smithsonian Institution.
 
-import { writeFileSync, readFileSync } from "node:fs";
+import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import { csvParse, csvFormat } from "d3-dsv";
 
 const WFS_URL =
@@ -32,9 +32,11 @@ const OUT = "public/data/gvp-volcanoes.csv";
 const MIN_VEI = 4;
 
 const rows = process.argv[2] ? readLocal(process.argv[2]) : await fetchWfs();
+assertColumns(rows);
+const curated = loadCurated();
 
 const events = [];
-const skipped = { noYear: 0, lowVei: 0, badRegion: 0 };
+const skipped = { noYear: 0, lowVei: 0, badRegion: 0, curated: 0 };
 
 for (const row of rows) {
   const vei = Number(row.VEI ?? row.vei ?? "");
@@ -61,6 +63,14 @@ for (const row of rows) {
   const name = (row.VolcanoName ?? row.volcanoname ?? "Unnamed volcano").trim();
   const number = String(row.VolcanoNumber ?? row.volcanonumber ?? "").trim();
 
+  // An eruption already written up by hand keeps its curated entry, with its
+  // curated wording and sources. Matching on name and year rather than on id
+  // avoids hard-coding GVP volcano numbers into the curated files.
+  if (isCurated(name, startYear)) {
+    skipped.curated++;
+    continue;
+  }
+
   events.push({
     // GVP encodes BC as a negative year in its own convention, where -1610
     // means 1610 BCE. Our parser refuses bare negatives precisely because ISO
@@ -86,13 +96,56 @@ writeFileSync(OUT, `${csvFormat(unique)}\n`);
 console.log(
   `${unique.length} eruptions written to ${OUT} ` +
     `(skipped ${skipped.lowVei} below VEI ${MIN_VEI}, ${skipped.noYear} undated, ` +
-    `${skipped.badRegion} unplaceable)`,
+    `${skipped.badRegion} unplaceable, ${skipped.curated} already curated)`,
 );
+
+
 
 // --- helpers ---------------------------------------------------------------
 
+/**
+ * Fail loudly on a schema mismatch. GVP's service can rename or re-case its
+ * columns; without this the script would quietly write an empty file and the
+ * cause would read like a data problem rather than a contract change.
+ */
+function assertColumns(sample) {
+  if (sample.length === 0) throw new Error("No rows received from GVP");
+  const seen = new Set(Object.keys(sample[0]).map((key) => key.toLowerCase()));
+  const missing = ["vei", "startdateyear", "volcanoname", "latitude", "longitude"].filter(
+    (column) => !seen.has(column),
+  );
+  if (missing.length) {
+    throw new Error(
+      `GVP schema mismatch: missing ${missing.join(", ")}. ` +
+        `Columns received: ${Object.keys(sample[0]).join(", ")}`,
+    );
+  }
+}
+
 function readLocal(path) {
   return csvParse(readFileSync(path, "utf8"));
+}
+
+/**
+ * Curated nature events, so the same eruption is not told twice.
+ * Returns entries of [lowercased label, start year].
+ */
+function loadCurated() {
+  const path = "public/data/nature.csv";
+  if (!existsSync(path)) return [];
+  return csvParse(readFileSync(path, "utf8"))
+    .filter((row) => row.category === "nature")
+    .map((row) => [fold(row.label), Number(/(\d{1,6})/.exec(row.start)?.[1] ?? NaN)]);
+}
+
+/** Lowercase and strip diacritics, so "Eldgjá" matches GVP's "Eldgja". */
+function fold(text) {
+  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+function isCurated(name, startYear) {
+  const needle = fold(name);
+  return curated.some(([label, year]) => year === Math.abs(startYear) && label.includes(needle));
 }
 
 async function fetchWfs() {

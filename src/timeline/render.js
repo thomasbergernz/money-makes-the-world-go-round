@@ -24,7 +24,9 @@ export function formatEventRange(event) {
   const circa = isUncertain(event);
   const start = formatYear(event.start, { circa });
   if (event.instant) return start;
-  return `${start} – ${formatYear(eventEnd(event))}`;
+  // Both ends carry the qualifier: "c. 1300 – 1850" would claim the end is
+  // known precisely when the uncertainty covers the whole event.
+  return `${start} – ${formatYear(eventEnd(event), { circa })}`;
 }
 
 /**

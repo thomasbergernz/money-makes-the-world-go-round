@@ -72,9 +72,22 @@ npm run ingest:gvp                       # fetch from the GVP web service
 npm run ingest:gvp -- path/to/export.csv # or use a local export
 ```
 
-It writes `public/data/gvp-volcanoes.csv`, which the manifest marks `bulk: true`
-and the UI loads only when its chip is switched on. Curated events win any id
-collision, so switching the layer on never doubles an event you already curated.
+It writes `public/data/gvp-volcanoes.csv` (git-ignored — it is generated, not
+authored), which the manifest marks `bulk: true` and the UI loads only when its
+chip is switched on.
+
+An eruption already written up in `nature.csv` is skipped at ingest time,
+matched on volcano name and year with diacritics folded, so switching the layer
+on never tells the same eruption twice. `dedupeById` is the runtime backstop for
+anything that slips through. The script fails loudly if GVP's columns do not
+match what it expects, rather than quietly writing an empty file.
+
+`test/fixtures/gvp-sample.csv` is a small export-shaped fixture for exercising
+the script offline:
+
+```bash
+npm run ingest:gvp -- test/fixtures/gvp-sample.csv
+```
 
 ## How it is put together
 
