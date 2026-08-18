@@ -206,12 +206,19 @@ export function createTimeline(container, options = {}) {
       // whatever range is in view, clamped into the new extent, and move the
       // brush to match — a selection rect that disagrees with the detail band
       // is worse than no selection at all.
-      const current = brushControl ? clamp(chart.mainScale.domain(), full) : null;
+      //
+      // "Was the reader zoomed in?" has to be asked against the *old* extent.
+      // A bulk layer usually widens the extent, so comparing the old view to
+      // the new full range would read an unzoomed view as a selection and
+      // paint a brush across nearly the whole band.
+      const wasZoomed =
+        brushControl != null && !sameRange(chart.mainScale.domain(), chart.naviScale.domain());
+      const current = wasZoomed ? clamp(chart.mainScale.domain(), full) : null;
 
       chart.naviScale.domain(full);
       chart.mainScale.domain(current ?? full);
       if (!brushControl) attach();
-      else brushControl.setDomain(current && !sameRange(current, full) ? current : null);
+      else brushControl.setDomain(current);
     },
 
     /** Set the filtered subset that is actually drawn. */

@@ -63,31 +63,33 @@ a failing test rather than a blank lane.
 
 ### Bulk layers
 
-Datasets too large to curate load on demand. `scripts/ingest-gvp.mjs` normalises
-the Smithsonian Global Volcanism Program eruption catalogue into the same
-schema:
+Datasets too large to curate load on demand. `scripts/ingest-gvp.mjs` pulls the
+Smithsonian Global Volcanism Program eruption catalogue from its WFS endpoint
+and normalises it into the same schema:
 
 ```bash
-npm run ingest:gvp                       # fetch from the GVP web service
-npm run ingest:gvp -- path/to/export.csv # or use a local export
+npm run ingest:gvp                        # fetch from the GVP web service
+npm run ingest:gvp -- saved-response.json # or replay a saved response
 ```
 
-It writes `public/data/gvp-volcanoes.csv` (git-ignored — it is generated, not
+A run over the full catalogue (11,089 eruptions) yields **592 events**: only
+confirmed eruptions, only VEI 4 and above — below that an eruption has no
+plausible climate or economic signature — and only back to 3500 BC, so the layer
+cannot stretch the axis into prehistory.
+
+GVP's `StartDateYearUncertainty` maps straight onto our `uncertainty`, so an
+eruption dated to ±500 years renders as the range it actually is. GVP writes BCE
+years as plain negatives in its own convention; the script converts them to an
+explicit `"2150 BC"` rather than passing a negative into a parser that would
+read it one year differently.
+
+Output goes to `public/data/gvp-volcanoes.csv` (git-ignored — generated, not
 authored), which the manifest marks `bulk: true` and the UI loads only when its
-chip is switched on.
-
-An eruption already written up in `nature.csv` is skipped at ingest time,
-matched on volcano name and year with diacritics folded, so switching the layer
-on never tells the same eruption twice. `dedupeById` is the runtime backstop for
-anything that slips through. The script fails loudly if GVP's columns do not
+chip is switched on. An eruption already written up in `nature.csv` is skipped at
+ingest time, matched on volcano name and year with diacritics folded, so
+switching the layer on never tells the same eruption twice; `dedupeById` is the
+runtime backstop. The script fails loudly if GVP's properties or geometry do not
 match what it expects, rather than quietly writing an empty file.
-
-`test/fixtures/gvp-sample.csv` is a small export-shaped fixture for exercising
-the script offline:
-
-```bash
-npm run ingest:gvp -- test/fixtures/gvp-sample.csv
-```
 
 ## How it is put together
 

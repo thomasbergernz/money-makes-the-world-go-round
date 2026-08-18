@@ -7,7 +7,7 @@
 //
 // Usage:
 //   node scripts/ingest-gvp.mjs                       # fetch from the GVP WFS
-//   node scripts/ingest-gvp.mjs path/to/export.csv    # use a local export
+//   node scripts/ingest-gvp.mjs path/to/export.json   # use a saved response
 //
 // Output: public/data/gvp-volcanoes.csv, which the manifest marks bulk:true
 // and the UI loads only when its chip is switched on.
@@ -26,110 +26,177 @@ const WFS_URL =
 
 const OUT = "public/data/gvp-volcanoes.csv";
 
-// Only eruptions at or above this Volcanic Explosivity Index are worth a lane:
-// below VEI 4 an eruption has no plausible climate or economic signature, and
-// including them would bury the events the timeline exists to correlate.
+// Only eruptions at or above this Volcanic Explosivity Index are worth a lane.
+// Below VEI 4 an eruption has no plausible climate or economic signature, and
+// the catalogue holds ~11,000 entries — including them would bury the events
+// the timeline exists to correlate.
 const MIN_VEI = 4;
 
-const rows = process.argv[2] ? readLocal(process.argv[2]) : await fetchWfs();
-assertColumns(rows);
+// The timeline's scope. GVP reaches back ~10,000 years; letting that through
+// would stretch the axis and squeeze all of recorded history into a corner.
+const EARLIEST_BCE = 3500;
+
+const features = process.argv[2] ? readLocal(process.argv[2]) : await fetchWfs();
+assertSchema(features);
 const curated = loadCurated();
 
 const events = [];
-const skipped = { noYear: 0, lowVei: 0, badRegion: 0, curated: 0 };
+const skipped = { notEruption: 0, noVei: 0, lowVei: 0, noYear: 0, tooEarly: 0, badRegion: 0, curated: 0 };
+const activityTypes = new Set();
 
-for (const row of rows) {
-  const vei = Number(row.VEI ?? row.vei ?? "");
-  if (!Number.isFinite(vei) || vei < MIN_VEI) {
+for (const feature of features) {
+  const row = feature.properties;
+
+  // GVP catalogues discredited and uncertain events alongside confirmed ones.
+  if (row.Activity_Type !== "Confirmed Eruption") {
+    activityTypes.add(row.Activity_Type);
+    skipped.notEruption++;
+    continue;
+  }
+
+  const vei = row.ExplosivityIndexMax;
+  if (vei === null || vei === undefined || vei === "") {
+    skipped.noVei++;
+    continue;
+  }
+  if (Number(vei) < MIN_VEI) {
     skipped.lowVei++;
     continue;
   }
 
-  const startYear = Number(row.StartDateYear ?? row.startdateyear ?? "");
-  if (!Number.isFinite(startYear) || startYear === 0) {
+  const year = Number(row.StartDateYear);
+  if (!Number.isFinite(year) || year === 0) {
     skipped.noYear++;
     continue;
   }
+  if (year < -EARLIEST_BCE) {
+    skipped.tooEarly++;
+    continue;
+  }
 
-  const region = regionFor(
-    Number(row.Latitude ?? row.latitude),
-    Number(row.Longitude ?? row.longitude),
-  );
+  const [lon, lat] = feature.geometry?.coordinates ?? [];
+  const region = regionFor(lat, lon);
   if (!region) {
     skipped.badRegion++;
     continue;
   }
 
-  const name = (row.VolcanoName ?? row.volcanoname ?? "Unnamed volcano").trim();
-  const number = String(row.VolcanoNumber ?? row.volcanonumber ?? "").trim();
+  const name = String(row.Volcano_Name ?? "Unnamed volcano").trim();
 
   // An eruption already written up by hand keeps its curated entry, with its
   // curated wording and sources. Matching on name and year rather than on id
   // avoids hard-coding GVP volcano numbers into the curated files.
-  if (isCurated(name, startYear)) {
+  if (isCurated(name, year)) {
     skipped.curated++;
     continue;
   }
 
+  const uncertainty = Number(row.StartDateYearUncertainty) || 0;
+  const start = gvpDate(year, row.StartDateMonth, row.StartDateDay);
+  const end = row.EndDateYear ? gvpDate(Number(row.EndDateYear), row.EndDateMonth, row.EndDateDay) : "";
+
   events.push({
-    // GVP encodes BC as a negative year in its own convention, where -1610
-    // means 1610 BCE. Our parser refuses bare negatives precisely because ISO
-    // reads them one year differently, so the era is spelled out here.
-    id: `gvp-${number || slug(name)}-${Math.abs(startYear)}${startYear < 0 ? "bc" : ""}`,
-    start: startYear < 0 ? `${Math.abs(startYear)} BC` : String(startYear),
-    end: "",
+    id: `gvp-${row.Eruption_Number}`,
+    start,
+    // Only keep an end that actually extends the event; GVP records many
+    // eruptions that start and stop within one day.
+    end: end && end !== start ? end : "",
     label: `${name} eruption (VEI ${vei})`,
     category: "nature",
     region,
-    certainty: startYear < 1500 ? "approx" : "year",
-    uncertainty: "",
+    certainty: certaintyFor(row, year, uncertainty),
+    uncertainty: uncertainty || "",
     source: "Global Volcanism Program, Volcanoes of the World, Smithsonian Institution",
-    link: number ? `https://volcano.si.edu/volcano.cfm?vn=${number}` : "",
+    link: row.Volcano_Number ? `https://volcano.si.edu/volcano.cfm?vn=${row.Volcano_Number}` : "",
   });
 }
 
 // Same first-wins rule the app uses, applied here so the file itself is clean.
 const unique = [...new Map(events.map((event) => [event.id, event])).values()];
-unique.sort((a, b) => a.label.localeCompare(b.label));
+unique.sort((a, b) => a.id.localeCompare(b.id));
 
 writeFileSync(OUT, `${csvFormat(unique)}\n`);
 console.log(
-  `${unique.length} eruptions written to ${OUT} ` +
-    `(skipped ${skipped.lowVei} below VEI ${MIN_VEI}, ${skipped.noYear} undated, ` +
-    `${skipped.badRegion} unplaceable, ${skipped.curated} already curated)`,
+  `${unique.length} eruptions written to ${OUT}\n` +
+    `skipped: ${skipped.notEruption} not confirmed eruptions, ${skipped.noVei} without a VEI, ` +
+    `${skipped.lowVei} below VEI ${MIN_VEI}, ${skipped.noYear} undated, ` +
+    `${skipped.tooEarly} earlier than ${EARLIEST_BCE} BC, ${skipped.badRegion} unplaceable, ` +
+    `${skipped.curated} already curated`,
 );
+if (activityTypes.size) {
+  console.log(`activity types skipped: ${[...activityTypes].join(", ")}`);
+}
 
-
-
-// --- helpers ---------------------------------------------------------------
+// --- date handling ---------------------------------------------------------
 
 /**
- * Fail loudly on a schema mismatch. GVP's service can rename or re-case its
- * columns; without this the script would quietly write an empty file and the
- * cause would read like a data problem rather than a contract change.
+ * A GVP date as a string our parser accepts.
+ *
+ * GVP writes BCE years as plain negatives, where -1815 means 1815 BCE. That is
+ * one year away from the ISO 8601 reading, which is exactly why the parser
+ * refuses bare negatives — so the era is spelled out here rather than passed
+ * through. Month and day are 0 when unknown.
  */
-function assertColumns(sample) {
-  if (sample.length === 0) throw new Error("No rows received from GVP");
-  const seen = new Set(Object.keys(sample[0]).map((key) => key.toLowerCase()));
-  const missing = ["vei", "startdateyear", "volcanoname", "latitude", "longitude"].filter(
-    (column) => !seen.has(column),
-  );
+function gvpDate(year, month, day) {
+  if (year < 0) return `${-year} BC`; // BC is only ever year-precision for us
+  const pad = (n) => String(n).padStart(2, "0");
+  if (month > 0 && day > 0) return `${year}-${pad(month)}-${pad(day)}`;
+  if (month > 0) return `${year}-${pad(month)}`;
+  return String(year);
+}
+
+function certaintyFor(row, year, uncertainty) {
+  // Our schema requires a contested date to state a range, so a queried date
+  // with no stated uncertainty is only ever "approx".
+  if (uncertainty > 0) return row.StartDateYearModifier === "?" ? "contested" : "approx";
+  if (row.StartDateYearModifier === "?") return "approx";
+  if (row.StartDateDay > 0) return "exact";
+  if (year < 1500) return "approx";
+  return "year";
+}
+
+// --- input -----------------------------------------------------------------
+
+function readLocal(path) {
+  return JSON.parse(readFileSync(path, "utf8")).features;
+}
+
+async function fetchWfs() {
+  console.log(`Fetching ${WFS_URL}`);
+  const response = await fetch(WFS_URL);
+  if (!response.ok) {
+    throw new Error(`GVP request failed: ${response.status} ${response.statusText}`);
+  }
+  return (await response.json()).features;
+}
+
+/**
+ * Fail loudly on a schema change. GVP's service can rename its columns; without
+ * this the script would quietly write an empty file and the cause would read
+ * like a data problem rather than a contract change.
+ */
+function assertSchema(sample) {
+  if (!sample?.length) throw new Error("No features received from GVP");
+  const seen = new Set(Object.keys(sample[0].properties ?? {}));
+  const missing = [
+    "Volcano_Name",
+    "Eruption_Number",
+    "Activity_Type",
+    "ExplosivityIndexMax",
+    "StartDateYear",
+  ].filter((column) => !seen.has(column));
   if (missing.length) {
     throw new Error(
       `GVP schema mismatch: missing ${missing.join(", ")}. ` +
-        `Columns received: ${Object.keys(sample[0]).join(", ")}`,
+        `Properties received: ${[...seen].join(", ")}`,
     );
+  }
+  if (!sample[0].geometry?.coordinates) {
+    throw new Error("GVP features carry no geometry; coordinates are needed to assign a region");
   }
 }
 
-function readLocal(path) {
-  return csvParse(readFileSync(path, "utf8"));
-}
-
-/**
- * Curated nature events, so the same eruption is not told twice.
- * Returns entries of [lowercased label, start year].
- */
+/** Curated nature events, so the same eruption is not told twice. */
 function loadCurated() {
   const path = "public/data/nature.csv";
   if (!existsSync(path)) return [];
@@ -140,26 +207,12 @@ function loadCurated() {
 
 /** Lowercase and strip diacritics, so "Eldgjá" matches GVP's "Eldgja". */
 function fold(text) {
-  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
 function isCurated(name, startYear) {
   const needle = fold(name);
   return curated.some(([label, year]) => year === Math.abs(startYear) && label.includes(needle));
-}
-
-async function fetchWfs() {
-  console.log(`Fetching ${WFS_URL}`);
-  const response = await fetch(WFS_URL);
-  if (!response.ok) {
-    throw new Error(`GVP request failed: ${response.status} ${response.statusText}`);
-  }
-  const json = await response.json();
-  return json.features.map((feature) => feature.properties);
-}
-
-function slug(text) {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
 /**
