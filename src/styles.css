@@ -1,0 +1,377 @@
+:root {
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --ink: #1d1c1a;
+  --ink-soft: #605c56;
+  --ink-faint: #96918a;
+  --rule: #e3dfd8;
+  --lane-bg: #f3f1ed;
+  --lane-bg-empty: #f8f7f4;
+  --accent: #1d1c1a;
+  --radius: 6px;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Helvetica, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17161a;
+    --surface: #1f1e23;
+    --ink: #f0eeea;
+    --ink-soft: #a8a39c;
+    --ink-faint: #6d6862;
+    --rule: #322f37;
+    --lane-bg: #232228;
+    --lane-bg-empty: #1c1b20;
+    --accent: #f0eeea;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.5 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- header ------------------------------------------------------------- */
+
+.app-head {
+  padding: 16px 20px 10px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.app-head h1 {
+  margin: 0;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+
+.tagline {
+  margin: 3px 0 12px;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  max-width: 68ch;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.filter-heading {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink-faint);
+  margin-right: 2px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-faint);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+
+.chip:hover {
+  border-color: var(--ink-faint);
+}
+
+.chip.is-on {
+  color: var(--ink);
+  border-color: var(--ink-faint);
+  background: var(--surface);
+}
+
+.chip-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--chip-color, currentColor);
+  opacity: 0.25;
+}
+
+.chip.is-on .chip-swatch {
+  opacity: 1;
+}
+
+.chip.is-loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* --- layout ------------------------------------------------------------- */
+
+.app-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 0;
+  align-items: start;
+}
+
+.timeline {
+  min-width: 0;
+  padding: 4px 0 0 0;
+}
+
+.panel {
+  border-left: 1px solid var(--rule);
+  padding: 14px 16px;
+  height: calc(100vh - 190px);
+  overflow-y: auto;
+}
+
+@media (max-width: 860px) {
+  .app-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .panel {
+    border-left: none;
+    border-top: 1px solid var(--rule);
+    height: auto;
+  }
+}
+
+.app-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 8px 20px 14px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-faint);
+  font-size: 11.5px;
+}
+
+.app-foot a {
+  color: inherit;
+}
+
+/* --- timeline ----------------------------------------------------------- */
+
+.timeline-svg {
+  display: block;
+  font-family: var(--sans);
+}
+
+.lane-bg {
+  fill: var(--lane-bg);
+}
+
+.lane.is-empty .lane-bg {
+  fill: var(--lane-bg-empty);
+}
+
+.lane-name {
+  fill: var(--ink-soft);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.lane-label.is-empty .lane-name {
+  fill: var(--ink-faint);
+  font-weight: 400;
+}
+
+.lane-count {
+  fill: var(--ink-faint);
+  font-size: 9.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Labels sit partly over their own bar and partly over the lane behind it, so
+   they carry a halo in the lane colour rather than relying on either. */
+.item-label {
+  fill: var(--ink);
+  font-size: 9.5px;
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: var(--lane-bg);
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
+}
+
+.item .body,
+.item .dot {
+  shape-rendering: crispEdges;
+}
+
+.item .dot {
+  shape-rendering: auto;
+}
+
+/* An uncertain date must not read as a crisp one. */
+.item.is-uncertain .body {
+  opacity: 0.72;
+}
+
+.item .uncertainty {
+  opacity: 0.18;
+}
+
+.cursor-overlay {
+  fill: transparent;
+  cursor: crosshair;
+}
+
+.cursor-line {
+  stroke: var(--accent);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+  pointer-events: none;
+}
+
+.cursor-label {
+  fill: var(--accent);
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 3px;
+}
+
+.axis .tick line {
+  stroke: var(--rule);
+}
+
+.axis .tick text {
+  fill: var(--ink-faint);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The era boundary is the one tick worth emphasising. */
+.axis .tick.era-boundary line {
+  stroke: var(--ink-faint);
+}
+
+.axis .tick.era-boundary text {
+  fill: var(--ink-soft);
+  font-weight: 600;
+}
+
+.navi-bg {
+  fill: var(--lane-bg);
+}
+
+.navi-brush .selection {
+  fill: var(--accent);
+  fill-opacity: 0.1;
+  stroke: var(--ink-faint);
+}
+
+.navi-brush .handle {
+  fill: var(--ink-faint);
+}
+
+/* --- panel -------------------------------------------------------------- */
+
+.panel-year {
+  margin: 0;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.panel-count {
+  margin: 1px 0 14px;
+  color: var(--ink-faint);
+  font-size: 11.5px;
+}
+
+.panel-region h3 {
+  margin: 12px 0 4px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink-faint);
+  font-weight: 600;
+}
+
+.panel-region ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.panel-region li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 3px 0 3px 9px;
+  border-left: 2px solid var(--event-color, var(--rule));
+  font-size: 12.5px;
+}
+
+.event-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.event-range {
+  flex: none;
+  color: var(--ink-faint);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* --- tooltip ------------------------------------------------------------ */
+
+.tooltip {
+  position: fixed;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-width: 280px;
+  padding: 7px 10px;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--event-color, var(--rule));
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.12);
+  pointer-events: none;
+  font-size: 12.5px;
+}
+
+.tooltip[hidden] {
+  display: none;
+}
+
+.tooltip-range {
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.tooltip-meta,
+.tooltip-source {
+  color: var(--ink-faint);
+  font-size: 11px;
+}
