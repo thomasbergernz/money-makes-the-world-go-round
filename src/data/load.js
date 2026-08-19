@@ -4,6 +4,23 @@ import { csvParse } from "d3-dsv";
 import { normaliseDataset, dedupeById, REQUIRED_COLUMNS } from "./schema.js";
 
 /**
+ * The build stamp, injected by Vite. Falls back to a literal when the module is
+ * imported outside a Vite build, such as from a unit test.
+ */
+const DATA_VERSION = typeof __DATA_VERSION__ === "string" ? __DATA_VERSION__ : "dev";
+
+/**
+ * A dataset URL carrying the build stamp.
+ *
+ * Without it a returning visitor keeps their cached copy of a CSV after a
+ * deploy has changed it — the bundles bust themselves via content-hashed
+ * filenames, but these files sit at stable paths and would not.
+ */
+export function dataUrl(file) {
+  return `${file}?v=${DATA_VERSION}`;
+}
+
+/**
  * Load and normalise one dataset.
  *
  * A missing file is not an error — datasets are compiled incrementally and the
@@ -16,7 +33,7 @@ import { normaliseDataset, dedupeById, REQUIRED_COLUMNS } from "./schema.js";
 export async function loadDataset(dataset) {
   let text;
   try {
-    const response = await fetch(dataset.file);
+    const response = await fetch(dataUrl(dataset.file));
     if (!response.ok) return { events: [], errors: [], missing: true };
     text = await response.text();
   } catch {

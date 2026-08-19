@@ -233,3 +233,17 @@ describe("estimateTokens", () => {
     expect(estimateTokens("")).toBe(0);
   });
 });
+
+describe("dataUrl", () => {
+  it("stamps every dataset request so a deploy invalidates cached CSVs", async () => {
+    const { dataUrl } = await import("../src/data/load.js");
+    const url = dataUrl("data/nature.csv");
+    expect(url).toMatch(/^data\/nature\.csv\?v=.+$/);
+  });
+
+  it("gives every dataset the same stamp, so one deploy busts them together", async () => {
+    const { dataUrl } = await import("../src/data/load.js");
+    const stamp = (file) => dataUrl(file).split("?v=")[1];
+    expect(stamp("data/nature.csv")).toBe(stamp("data/economy.csv"));
+  });
+});
