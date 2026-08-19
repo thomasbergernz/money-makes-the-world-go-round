@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+# The workflow only reads the repository; nothing here publishes or deploys.
+permissions:
+  contents: read
+
+concurrency:
+  # A new push supersedes an in-flight run for the same ref.
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Unit tests plus validation of every shipped CSV: schema conformance,
+      # unique ids, time scope, contested-date ranges, region and category
+      # coverage. A malformed data row fails here rather than in a browser.
+      - run: npm test
+
+      - run: npm run build
+
+      # The build must stay self-contained. A CDN reference or an absolute
+      # asset path would break the site when served from a Pages subpath, and
+      # neither shows up in the unit tests.
+      - name: Check the bundle is self-contained
+        run: |
+          if grep -rIoE 'https?://[a-zA-Z0-9./_-]+' dist \
+            | grep -vE 'www\.w3\.org|bl\.ocks\.org|volcano\.si\.edu'; then
+            echo "::error::Bundle references an unexpected external URL"
+            exit 1
+          fi
+          if grep -qE '(src|href)="/[^/]' dist/index.html; then
+            echo "::error::Bundle uses an absolute asset path; it will not serve from a subpath"
+            exit 1
+          fi
+          echo "Bundle is self-contained."
