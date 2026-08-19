@@ -206,6 +206,11 @@ body {
   color: inherit;
 }
 
+.app-foot .is-error {
+  color: #b4553f;
+  font-weight: 600;
+}
+
 /* --- timeline ----------------------------------------------------------- */
 
 .timeline-svg {

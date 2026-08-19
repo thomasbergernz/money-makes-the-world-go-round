@@ -57,6 +57,16 @@ async function boot() {
   const core = await loadDatasets(CORE_DATASETS);
   report(core);
 
+  // Every core dataset absent means the app loaded but its data did not — a
+  // misconfigured deploy, a bad base path, an offline cache. Rendering an
+  // empty timeline in silence looks identical to a broken build, so say so.
+  if (core.events.length === 0) {
+    statusEl.textContent =
+      "No event data could be loaded. Check that the data/ files are being served alongside the page.";
+    statusEl.classList.add("is-error");
+    return;
+  }
+
   /** Bulk layers, loaded lazily and cached by dataset id. */
   const bulkCache = new Map();
   let corpus = [];
