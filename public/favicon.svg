@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Money Makes the World Go Round">
+  <!-- Four staggered lanes, in the domain colours the chart itself uses. No
+       background: the bars are saturated enough to read on a light or dark
+       tab strip, and a filled square would fight both. Four rather than six
+       because at 16px more than that collapses into a smudge. -->
+  <title>Money Makes the World Go Round</title>
+  <g>
+    <rect x="4" y="5" width="19" height="4" rx="2" fill="#2e8b6f" />
+    <rect x="9" y="12" width="19" height="4" rx="2" fill="#c9992b" />
+    <rect x="4" y="19" width="13" height="4" rx="2" fill="#b4553f" />
+    <rect x="12" y="26" width="14" height="4" rx="2" fill="#8262a8" />
+  </g>
+</svg>
