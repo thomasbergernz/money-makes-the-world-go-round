@@ -128,6 +128,45 @@ browser.
   falls back to `index.html` answers 200 for a missing CSV, and the parser would
   turn that HTML into hundreds of junk rows.
 
+## Verifying changes in a browser
+
+Most of this project cannot be checked by unit tests. Lane packing, the brush,
+the time cursor and the deployed base path are all only true on a page, so
+verification means driving a real browser. Two conventions keep that from
+swallowing the session:
+
+**Delegate the sweep to a subagent.** This is the only thing that actually
+saves context. `browser_run_code_unsafe` echoes the script back in its result
+whether it was passed inline or read from a file via `filename` — that was
+measured, not assumed, and the file route saves nothing on its own. What does
+work is running the sweep inside a subagent: the script echo and the raw DOM
+output land in its context, and only the verdict comes back.
+
+Keeping the script in `.playwright-mcp/` (git-ignored) is still worth doing so
+a check is repeatable and reviewable rather than retyped each time — just do
+not expect it to reduce context by itself.
+
+**Keep the debugging inline.** A routine "does the live site still
+work" pass — load, count events, check the axis, toggle a filter, exercise the
+Ask tab — belongs in a subagent that reports pass/fail. Debugging does not:
+every real bug found here was identified from one specific line of raw output
+that a summary would have thrown away.
+
+Return counts and booleans once a check is routine. Returning whole objects is
+worth it the first time, when you do not yet know what to assert — that is how
+the footer was caught claiming "634 of 634 shown" while 52 events were visible.
+
+The checks worth running against a deploy:
+
+- event count matches the footer, and the axis reads `3500 BC … 1 … 2000` with
+  no negative labels and no year zero
+- the brush rescales every lane together and the selection rect agrees with the
+  detail band after a window resize
+- a filter toggle re-packs lanes and empty regions collapse to labelled strips
+- the time cursor at 1816 lists Tambora's consequences across several lanes
+- the GVP chip loads the bulk layer without duplicating curated Tambora
+- the Ask tab produces a prompt containing the grounding preamble
+
 ## Data
 
 `public/data/*.csv`, one file per domain, all on the schema documented in
