@@ -7,6 +7,16 @@ on:
   push:
     branches: [master]
   workflow_dispatch:
+  # Callable so the monthly GVP refresh can publish the commit it just pushed.
+  # A workflow triggered by GITHUB_TOKEN does not itself trigger `push`, so the
+  # refresh has to ask for the deploy explicitly.
+  workflow_call:
+    inputs:
+      ref:
+        description: The ref to build and publish. Defaults to the triggering ref.
+        type: string
+        required: false
+        default: ""
 
 # Least privilege: read the repo, write a Pages deployment, and mint the OIDC
 # token deploy-pages exchanges for a deployment. Nothing else.
@@ -26,6 +36,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          # `inputs` is empty for push and dispatch, so this falls through to
+          # the triggering ref in the normal case.
+          ref: ${{ inputs.ref || github.ref }}
 
       - uses: actions/setup-node@v5
         with:
@@ -38,14 +52,6 @@ jobs:
 
       # Same gate as CI: a malformed CSV fails here, not in a browser.
       - run: npm test
-
-      # The GVP bulk layer is generated, not committed, so it has to be rebuilt
-      # for each deploy. It is an optional layer and the viewer treats a missing
-      # dataset as absent rather than broken, so a Smithsonian outage degrades
-      # the site by one opt-in chip instead of blocking the whole deployment.
-      - name: Regenerate the GVP volcano layer
-        continue-on-error: true
-        run: npm run ingest:gvp
 
       - run: npm run build
 

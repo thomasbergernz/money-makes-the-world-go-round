@@ -107,9 +107,19 @@ years as plain negatives in its own convention; the script converts them to an
 explicit `"2150 BC"` rather than passing a negative into a parser that would
 read it one year differently.
 
-Output goes to `public/data/gvp-volcanoes.csv` (git-ignored — generated, not
-authored), which the manifest marks `bulk: true` and the UI loads only when its
-chip is switched on. An eruption already written up in `nature.csv` is skipped at
+Output goes to `public/data/gvp-volcanoes.csv`, which the manifest marks
+`bulk: true` and the UI loads only when its chip is switched on.
+
+The file is **committed**, and refreshed once a month by
+`.github/workflows/refresh-gvp.yml` — which commits only when the regenerated
+output actually differs, and then republishes. Regeneration is deterministic,
+so an unchanged catalogue produces a byte-identical file and no commit.
+
+It used to be rebuilt on every deploy. That pulled 8.9 MB from a free public
+research service per push to produce an identical 112 KB file, and made deploys
+non-reproducible: the same commit could publish different data with nothing in
+git recording it. Committing the layer makes it reviewable in diffs and pins it
+to a commit like every other dataset. An eruption already written up in `nature.csv` is skipped at
 ingest time, matched on volcano name and year with diacritics folded, so
 switching the layer on never tells the same eruption twice; `dedupeById` is the
 runtime backstop. The script fails loudly if GVP's properties or geometry do not

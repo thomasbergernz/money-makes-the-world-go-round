@@ -11,7 +11,7 @@ npm run test:watch   # watch mode
 npx vitest run test/year.test.js          # one file
 npx vitest run -t "rejects the bare-minus" # one test by name
 npm run build        # static bundle in dist/ (relative base, subpath-safe)
-npm run ingest:gvp   # regenerate the optional bulk volcano layer
+npm run ingest:gvp   # regenerate the committed bulk volcano layer
 ```
 
 ## What this is
@@ -111,6 +111,11 @@ browser.
   or a domain that has events — at the last rung each domain keeps a
   representative even if that exceeds the per-region target. A digest that
   omits events silently is the same class of lie as a synthetic duration.
+- **The GVP layer is committed, not built at deploy time.** It is refreshed
+  monthly by `.github/workflows/refresh-gvp.yml`, which commits only when the
+  regenerated file differs and then republishes. Regenerating on every deploy
+  hammered a public research service for a byte-identical result and made two
+  deploys of one commit able to publish different data.
 - **The Ask tab makes no network calls.** No API key, no backend, no requests.
   If that ever changes, the panel's copy has to change with it — it currently
   promises the page sends nothing.

@@ -1,0 +1,85 @@
+name: Refresh GVP volcano layer
+
+# The Smithsonian eruption catalogue is a bulk layer: 11,089 records upstream,
+# 592 after filtering to confirmed eruptions of VEI 4 and above since 3500 BC.
+# Almost all of it is historical and immutable — only ~200 of those eruptions
+# postdate 2020 — so it does not need rebuilding on every deploy. Doing that
+# pulled 8.9 MB from a free public research service per push to produce a
+# byte-identical file, and made deploys non-deterministic: the same commit
+# could publish different data with nothing in git recording it.
+#
+# So the CSV is committed, and this refreshes it once a month.
+on:
+  schedule:
+    # 04:17 UTC on the 1st. Off the hour, because scheduled jobs on the hour
+    # queue behind everyone else's.
+    - cron: "17 4 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gvp-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # No continue-on-error. A schema change upstream broke this script once
+      # already; when that happens the job should go red, not quietly publish
+      # a site that is missing a layer.
+      - run: npm run ingest:gvp
+
+      - id: diff
+        run: |
+          if git diff --quiet -- public/data/gvp-volcanoes.csv; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Upstream catalogue unchanged — nothing to commit."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat -- public/data/gvp-volcanoes.csv
+          fi
+
+      # The regenerated file goes through the same validation as hand-curated
+      # data: schema conformance, unique ids, time scope, contested-date ranges.
+      - name: Validate the regenerated layer
+        if: steps.diff.outputs.changed == 'true'
+        run: npm test
+
+      - name: Commit the refreshed layer
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "data: refresh the GVP volcano layer
+
+          Regenerated from the Smithsonian Global Volcanism Program catalogue by
+          the monthly schedule in .github/workflows/refresh-gvp.yml." \
+            -- public/data/gvp-volcanoes.csv
+          git push
+
+  # A push made with GITHUB_TOKEN does not trigger the `push` workflows, so the
+  # deploy has to be requested explicitly, against the ref just pushed.
+  publish:
+    needs: refresh
+    if: needs.refresh.outputs.changed == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ref: master
