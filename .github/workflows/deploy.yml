@@ -1,0 +1,64 @@
+name: Deploy to GitHub Pages
+
+# The site is a static Vite bundle. Building it here means dist/ never has to
+# be committed: the repository stays source-only and every push to master
+# republishes from a clean checkout.
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# Least privilege: read the repo, write a Pages deployment, and mint the OIDC
+# token deploy-pages exchanges for a deployment. Nothing else.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time. Unlike CI, an in-flight deploy is not cancelled —
+# cancelling mid-publish can leave the live site on a half-uploaded artifact.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/configure-pages@v6
+
+      - run: npm ci
+
+      # Same gate as CI: a malformed CSV fails here, not in a browser.
+      - run: npm test
+
+      # The GVP bulk layer is generated, not committed, so it has to be rebuilt
+      # for each deploy. It is an optional layer and the viewer treats a missing
+      # dataset as absent rather than broken, so a Smithsonian outage degrades
+      # the site by one opt-in chip instead of blocking the whole deployment.
+      - name: Regenerate the GVP volcano layer
+        continue-on-error: true
+        run: npm run ingest:gvp
+
+      - run: npm run build
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

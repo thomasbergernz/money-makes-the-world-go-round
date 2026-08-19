@@ -33,6 +33,30 @@ so it serves correctly from a subpath such as GitHub Pages.
 - **Toggle the chips** to filter by domain or region. Lanes re-pack; empty
   regions collapse to a labelled strip so nothing jumps.
 
+## Handing a selection to an AI
+
+The brush and the chips already make a precise selection over the corpus. The
+**Ask** tab in the side panel turns that selection into a prompt.
+
+Pick a purpose — explain the correlations, answer a question, find what is
+missing, or draft a narrative — optionally type a question, and copy. The
+prompt carries the purpose instructions, a short grounding preamble (what the
+region and domain vocabularies mean, and that alignment on a timeline is not
+evidence of causation), the selection's range and filters, and the events
+themselves grouped by region.
+
+**Nothing is sent from the page.** There is no backend, no API key and no
+network call — it composes text and puts it on your clipboard, to paste into
+Claude, ChatGPT, or a coding agent. The tab is a prompt builder, not a chat, and
+it says so.
+
+Large selections are shortened in named steps: sources and links go first, then
+per-event detail, and only at the last step are events themselves dropped —
+never a whole region or domain. **Whatever was cut is stated inside the prompt**,
+because a digest that quietly omits two hundred events reads to a model as a
+complete window. The token figure in the panel is an estimate: counting exactly
+needs the token-counting endpoint, which this feature deliberately never calls.
+
 ## The data
 
 Six curated datasets live in `public/data/`, one per domain, all sharing one

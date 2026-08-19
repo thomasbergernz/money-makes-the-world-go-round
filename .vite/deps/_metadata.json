@@ -1,0 +1,49 @@
+{
+  "hash": "21a2f31d",
+  "configHash": "f262bf16",
+  "lockfileHash": "2a515048",
+  "browserHash": "d11dcfc0",
+  "optimized": {
+    "d3-selection": {
+      "src": "../../node_modules/d3-selection/src/index.js",
+      "file": "d3-selection.js",
+      "fileHash": "acbe44ac",
+      "needsInterop": false
+    },
+    "d3-array": {
+      "src": "../../node_modules/d3-array/src/index.js",
+      "file": "d3-array.js",
+      "fileHash": "8aff5f86",
+      "needsInterop": false
+    },
+    "d3-dsv": {
+      "src": "../../node_modules/d3-dsv/src/index.js",
+      "file": "d3-dsv.js",
+      "fileHash": "b3628520",
+      "needsInterop": false
+    },
+    "d3-scale": {
+      "src": "../../node_modules/d3-scale/src/index.js",
+      "file": "d3-scale.js",
+      "fileHash": "5b204d14",
+      "needsInterop": false
+    },
+    "d3-brush": {
+      "src": "../../node_modules/d3-brush/src/index.js",
+      "file": "d3-brush.js",
+      "fileHash": "8153d6c9",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-42OJMDOU": {
+      "file": "chunk-42OJMDOU.js"
+    },
+    "chunk-PUKH3G67": {
+      "file": "chunk-PUKH3G67.js"
+    },
+    "chunk-UFNGOIGH": {
+      "file": "chunk-UFNGOIGH.js"
+    }
+  }
+}

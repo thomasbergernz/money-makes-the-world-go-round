@@ -70,7 +70,9 @@ src/timeline/bands.js   SVG shell, scales, axes, redraw registry
 src/timeline/render.js  item rendering (interval rect / instant dot)
 src/timeline/brush.js   d3-brushX on the navigation band
 src/timeline/timeline.js composes the above into the public API
-src/ui/                 filters, cursor panel, tooltip, theme
+src/selection/selection.js  derives the current selection      [pure, tested]
+src/selection/digest.js     prompt assembly + the cap ladder   [pure, tested]
+src/ui/                 filters, cursor panel, ask tab, tabs, tooltip, theme
 public/data/*.csv       the datasets, served as static files
 scripts/ingest-gvp.mjs  bulk-layer ingest spike
 ```
@@ -98,6 +100,20 @@ browser.
 - **Lane packing follows the visible window**, recomputed on brush *end* only.
   Packing the whole corpus makes a quiet century unreadable; packing during the
   drag makes lanes jump under the pointer driving them.
+- **The selection is derived, never stored.** `buildSelection()` reads the
+  visible range and events from the timeline and the filters from the chips.
+  `rebuildLanes()` already runs at exactly the moments a selection changes and
+  fires `onWindowChange`; do not add a second listener or a mirrored selection
+  object. That mirroring is what made the navigation band and the detail band
+  disagree twice.
+- **The digest states what it dropped.** `digest.js` degrades a large selection
+  in named rungs and writes the loss into the prompt. It never drops a region
+  or a domain that has events — at the last rung each domain keeps a
+  representative even if that exceeds the per-region target. A digest that
+  omits events silently is the same class of lie as a synthetic duration.
+- **The Ask tab makes no network calls.** No API key, no backend, no requests.
+  If that ever changes, the panel's copy has to change with it — it currently
+  promises the page sends nothing.
 - **Curated events win id collisions.** `dedupeById` is first-wins and curated
   datasets load first, so a bulk layer can never double a hand-curated event.
   `ingest-gvp.mjs` also skips eruptions already present in `nature.csv`, matched

@@ -21,7 +21,11 @@
 
     <main class="app-body">
       <div id="timeline" class="timeline"></div>
-      <aside id="panel" class="panel"></aside>
+      <aside class="panel">
+        <div class="panel-tabs" role="tablist" aria-label="Panel"></div>
+        <div id="panel" role="tabpanel" aria-labelledby="panel-tab"></div>
+        <div id="ask" class="ask" role="tabpanel" aria-labelledby="ask-tab" hidden></div>
+      </aside>
     </main>
 
     <footer class="app-foot">

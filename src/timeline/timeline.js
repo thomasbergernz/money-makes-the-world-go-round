@@ -31,12 +31,16 @@ function clamp([lo, hi], [min, max]) {
  *          onHover?: (event: object|null, position: {x: number, y: number}) => void}} [options]
  */
 export function createTimeline(container, options = {}) {
-  const { onCursor = () => {}, onHover = () => {} } = options;
+  const { onCursor = () => {}, onHover = () => {}, onWindowChange = () => {} } = options;
 
   const chart = createChart(container, options);
 
   let visible = [];
   let windowed = [];
+  // The true extent of the corpus, before the scale's cosmetic padding. The
+  // padding exists so end-points are not flush against the edge; reporting it
+  // as part of a selection would claim years the data does not reach.
+  let dataExtent = null;
   let lanes = [];
   let trackHeight = 12;
   let brushControl = null;
@@ -55,6 +59,14 @@ export function createTimeline(container, options = {}) {
     const [lo, hi] = chart.mainScale.domain();
     windowed = visible.filter((event) => event.start <= hi && eventEnd(event) >= lo);
     const packed = buildLanes(windowed);
+    // The one place that already knows the visible range and the visible
+    // events. Anything wanting the current selection reads it from here rather
+    // than keeping its own copy.
+    onWindowChange({
+      from: dataExtent ? Math.max(lo, dataExtent[0]) : lo,
+      to: dataExtent ? Math.min(hi, dataExtent[1]) : hi,
+      events: windowed,
+    });
     const laid = layoutLanes(packed, { height: chart.mainHeight });
     lanes = laid.lanes;
     trackHeight = laid.trackHeight;
@@ -199,6 +211,7 @@ export function createTimeline(container, options = {}) {
     /** Set the full corpus. Fixes the overall extent that the navi band shows. */
     setData(events) {
       const [lo, hi] = extent(events.flatMap((event) => [event.start, eventEnd(event)]));
+      dataExtent = [lo, hi];
       const pad = Math.max(10, (hi - lo) * 0.01);
       const full = [lo - pad, hi + pad];
 
