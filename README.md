@@ -1,6 +1,6 @@
 # Money Makes the World Go Round
 
-A correlation timeline. Nature, economy, politics, science and thought on one
+A correlation timeline. Nature, economy, politics, science, religion and thought on one
 year axis, one lane per world region, from roughly 3000 BC to today.
 
 The point is not to list events. It is to make it possible to *see* that
@@ -35,7 +35,7 @@ so it serves correctly from a subpath such as GitHub Pages.
 
 ## The data
 
-Five curated datasets live in `public/data/`, one per domain, all sharing one
+Six curated datasets live in `public/data/`, one per domain, all sharing one
 schema:
 
 ```
@@ -56,7 +56,7 @@ id,start,end,label,category,region,certainty,uncertainty,source,link
   test suite.
 - `region` is a closed enum: `GLOBAL`, `EUROPE`, `MIDDLE_EAST`, `AFRICA`,
   `ASIA_EAST`, `ASIA_SOUTH`, `AMERICAS`, `OCEANIA`.
-- `category` is `nature`, `economy`, `politics`, `science` or `thought`.
+- `category` is `nature`, `economy`, `politics`, `science`, `religion` or `thought`.
 
 `npm test` validates every shipped CSV against the schema, so a malformed row is
 a failing test rather than a blank lane.

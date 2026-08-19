@@ -16,7 +16,7 @@ npm run ingest:gvp   # regenerate the optional bulk volcano layer
 
 ## What this is
 
-A multi-domain correlation timeline: five domains (`nature`, `economy`,
+A multi-domain correlation timeline: six domains (`nature`, `economy`,
 `politics`, `science`, `thought`) laid out in one horizontal lane per world
 region, on a shared year axis from ~3000 BC to today. A navigation band with a
 brush drives the detail band; a time cursor reports everything overlapping one

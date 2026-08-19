@@ -7,6 +7,7 @@ export const CATEGORY_COLORS = Object.freeze({
   economy: "#c9992b",
   politics: "#b4553f",
   science: "#4a72b8",
+  religion: "#96406b",
   thought: "#8262a8",
 });
 
@@ -15,6 +16,7 @@ export const CATEGORY_COLORS_DIM = Object.freeze({
   economy: "#e0cb90",
   politics: "#d8a597",
   science: "#a3b8dc",
+  religion: "#c9a0b6",
   thought: "#c0b0d4",
 });
 

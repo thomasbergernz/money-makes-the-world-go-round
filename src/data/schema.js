@@ -35,6 +35,7 @@ export const CATEGORIES = Object.freeze([
   "economy",
   "politics",
   "science",
+  "religion",
   "thought",
 ]);
 
@@ -43,6 +44,7 @@ export const CATEGORY_LABELS = Object.freeze({
   economy: "Economy & money",
   politics: "Politics & conflict",
   science: "Science & disease",
+  religion: "Religion & belief",
   thought: "Thought & culture",
 });
 

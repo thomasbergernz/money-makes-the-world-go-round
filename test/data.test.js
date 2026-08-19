@@ -16,8 +16,8 @@ const parsed = files.map((file) => {
 });
 
 describe("shipped datasets", () => {
-  it("ships at least the five core domains", () => {
-    for (const name of ["nature.csv", "economy.csv", "politics.csv", "science.csv", "thought.csv"]) {
+  it("ships at least the six core domains", () => {
+    for (const name of ["nature.csv", "economy.csv", "politics.csv", "science.csv", "religion.csv", "thought.csv"]) {
       expect(files).toContain(name);
     }
   });
@@ -70,7 +70,7 @@ describe("shipped datasets", () => {
     for (const region of ["GLOBAL", "EUROPE", "MIDDLE_EAST", "AFRICA", "ASIA_EAST", "ASIA_SOUTH", "AMERICAS", "OCEANIA"]) {
       expect(events.some((event) => event.region === region), `no events in ${region}`).toBe(true);
     }
-    for (const category of ["nature", "economy", "politics", "science", "thought"]) {
+    for (const category of ["nature", "economy", "politics", "science", "religion", "thought"]) {
       expect(events.some((event) => event.category === category), `no ${category} events`).toBe(true);
     }
   });

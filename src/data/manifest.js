@@ -9,6 +9,7 @@ export const DATASETS = [
   { id: "economy", file: "data/economy.csv", label: "Economy & money", bulk: false },
   { id: "politics", file: "data/politics.csv", label: "Politics & conflict", bulk: false },
   { id: "science", file: "data/science.csv", label: "Science & disease", bulk: false },
+  { id: "religion", file: "data/religion.csv", label: "Religion & belief", bulk: false },
   { id: "thought", file: "data/thought.csv", label: "Thought & culture", bulk: false },
   {
     id: "gvp",

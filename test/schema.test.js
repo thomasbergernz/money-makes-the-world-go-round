@@ -102,7 +102,7 @@ describe("enums", () => {
     expect(REGIONS[0]).toBe("GLOBAL");
   });
 
-  it("covers the five domains", () => {
-    expect(CATEGORIES).toEqual(["nature", "economy", "politics", "science", "thought"]);
+  it("covers the six domains", () => {
+    expect(CATEGORIES).toEqual(["nature", "economy", "politics", "science", "religion", "thought"]);
   });
 });
