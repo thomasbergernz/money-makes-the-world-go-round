@@ -134,3 +134,20 @@ xin-dynasty,9,23,Wang Mang's Xin dynasty interregnum,politics,ASIA_EAST,year,,Bo
 satavahana-dynasty,100 BC,220,Satavahana dynasty,politics,ASIA_SOUTH,contested,75,Puranas; inscriptions; numismatics,https://en.wikipedia.org/wiki/Satavahana_dynasty
 kushan-empire-founded,30,,Kujula Kadphises founds the Kushan Empire,politics,ASIA_SOUTH,approx,20,Hou Hanshu; numismatics,https://en.wikipedia.org/wiki/Kushan_Empire
 rise-of-teotihuacan,100 BC,550,Rise of Teotihuacan,politics,AMERICAS,approx,50,Archaeological record,https://en.wikipedia.org/wiki/Teotihuacan
+siege-of-vienna-1683,1683-09-12,,Second Ottoman siege of Vienna fails,politics,EUROPE,exact,,Habsburg and Ottoman records,https://en.wikipedia.org/wiki/Battle_of_Vienna
+safavid-empire,1501,1736,Safavid Empire makes Persia Shia,politics,MIDDLE_EAST,year,,Persian and Ottoman sources,https://en.wikipedia.org/wiki/Safavid_Iran
+ottoman-partition,1918-10-30,1923-07-24,Partition of the Ottoman Empire,politics,MIDDLE_EAST,exact,,Treaties of Mudros to Lausanne,https://en.wikipedia.org/wiki/Partition_of_the_Ottoman_Empire
+israel-founded,1948-05-14,,State of Israel declared,politics,MIDDLE_EAST,exact,,Declaration text; UN records,https://en.wikipedia.org/wiki/Israeli_Declaration_of_Independence
+six-day-war,1967-06-05,1967-06-10,Six-Day War,politics,MIDDLE_EAST,exact,,UN and state records,https://en.wikipedia.org/wiki/Six-Day_War
+yom-kippur-war,1973-10-06,1973-10-25,Yom Kippur War,politics,MIDDLE_EAST,exact,,UN and state records,https://en.wikipedia.org/wiki/Yom_Kippur_War
+battle-of-tondibi,1591-03,,Moroccan victory at Tondibi breaks the Songhai Empire,politics,AFRICA,year,,Timbuktu chronicles,https://en.wikipedia.org/wiki/Battle_of_Tondibi
+mfecane,1815,1840,Mfecane upheavals remake southern Africa,politics,AFRICA,approx,10,Oral tradition; colonial records,https://en.wikipedia.org/wiki/Mfecane
+battle-of-adwa,1896-03-01,,Ethiopia defeats Italy at Adwa,politics,AFRICA,exact,,Ethiopian and Italian records,https://en.wikipedia.org/wiki/Battle_of_Adwa
+tokugawa-shogunate,1603,1868,Tokugawa shogunate,politics,ASIA_EAST,year,,Japanese records,https://en.wikipedia.org/wiki/Tokugawa_shogunate
+opium-wars,1839,1860,Opium Wars force open Chinese trade,politics,ASIA_EAST,year,,Qing and British records,https://en.wikipedia.org/wiki/Opium_Wars
+battle-of-plassey,1757-06-23,,Battle of Plassey begins Company rule in Bengal,politics,ASIA_SOUTH,exact,,Company records,https://en.wikipedia.org/wiki/Battle_of_Plassey
+british-raj,1858-08-02,1947-08-15,British Raj,politics,ASIA_SOUTH,exact,,Government of India Act; state records,https://en.wikipedia.org/wiki/British_Raj
+first-fleet,1788-01-26,,First Fleet lands at Sydney Cove,politics,OCEANIA,exact,,Colonial records,https://en.wikipedia.org/wiki/First_Fleet
+treaty-of-waitangi,1840-02-06,,Treaty of Waitangi,politics,OCEANIA,exact,,Treaty text,https://en.wikipedia.org/wiki/Treaty_of_Waitangi
+atlantic-slavery-abolished,1807,1888,Abolition of Atlantic slavery from the British act to Brazil,politics,GLOBAL,year,,Legislative records,https://en.wikipedia.org/wiki/Abolitionism
+paris-agreement,2015-12-12,,Paris climate agreement adopted,politics,GLOBAL,exact,,Treaty text,https://en.wikipedia.org/wiki/Paris_Agreement
