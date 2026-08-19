@@ -34,29 +34,7 @@ jobs:
 
       - run: npm run build
 
-      # The build must stay self-contained. A CDN reference or an absolute
-      # asset path would break the site when served from a Pages subpath, and
-      # neither shows up in the unit tests.
-      #
-      # Scope is the page and its bundles only. dist/data/ is deliberately
-      # excluded: the schema has a `link` column holding a source URL per
-      # event, which is a hyperlink for a reader to click, never something the
-      # page fetches. Scanning it made every cited Wikipedia article look like
-      # a CDN dependency and failed the job on ordinary data additions.
-      #
-      # The allowlist is only what legitimately appears in the page itself:
-      # XML namespace identifiers emitted by d3, and the attribution link.
-      - name: Check the bundle is self-contained
-        run: |
-          external=$(grep -rIoE 'https?://[a-zA-Z0-9./_-]+' dist/index.html dist/assets \
-            | grep -vE 'www\.w3\.org|bl\.ocks\.org' || true)
-          if [ -n "$external" ]; then
-            echo "$external"
-            echo "::error::Bundle references an unexpected external URL"
-            exit 1
-          fi
-          if grep -qE '(src|href)="/[^/]' dist/index.html; then
-            echo "::error::Bundle uses an absolute asset path; it will not serve from a subpath"
-            exit 1
-          fi
-          echo "Bundle is self-contained."
+      # Asserted by a script rather than inline shell, so CI and the deploy
+      # run byte-identical logic. Two copies would drift, and drift is how the
+      # data-link false positive survived as long as it did.
+      - run: ./scripts/check-bundle.sh

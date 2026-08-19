@@ -49,6 +49,11 @@ jobs:
 
       - run: npm run build
 
+      # The same gate CI runs. Without it here, a bundle that reached for a CDN
+      # or used an absolute asset path would publish anyway and only turn CI
+      # red afterwards — the site would be broken and the deploy still green.
+      - run: ./scripts/check-bundle.sh
+
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
