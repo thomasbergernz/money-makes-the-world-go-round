@@ -47,6 +47,15 @@ export function createTimeline(container, options = {}) {
   /** Ids of the hovered event's chain, or null when nothing is highlighted. */
   let highlight = null;
 
+  /** True when the chain has something to show: at least two members in view. */
+  function chainInView(ids) {
+    let inView = 0;
+    for (const event of windowed) {
+      if (ids.has(event.id) && ++inView >= 2) return true;
+    }
+    return false;
+  }
+
   chart.resize();
 
   // --- lanes ---------------------------------------------------------------
@@ -60,6 +69,10 @@ export function createTimeline(container, options = {}) {
   function rebuildLanes() {
     const [lo, hi] = chart.mainScale.domain();
     windowed = visible.filter((event) => event.start <= hi && eventEnd(event) >= lo);
+    // A window change can move a highlighted chain's partners out of view; a
+    // highlight that no longer shows a partner is dropped rather than left to
+    // dim the whole band around one lit bar.
+    if (highlight && !chainInView(highlight)) highlight = null;
     const packed = buildLanes(windowed);
     // The one place that already knows the visible range and the visible
     // events. Anything wanting the current selection reads it from here rather
@@ -261,8 +274,12 @@ export function createTimeline(container, options = {}) {
      * to read a chain.
      */
     setHighlight(ids) {
-      if (ids === highlight || (ids == null && highlight == null)) return;
-      highlight = ids ?? null;
+      // A chain whose partners are all outside the window would dim the whole
+      // band around one lit bar — that reads as a glitch, not a highlight, so
+      // it only applies when at least one partner is actually in view.
+      const effective = ids != null && chainInView(ids) ? ids : null;
+      if (effective === highlight || (effective == null && highlight == null)) return;
+      highlight = effective;
       chart.mainBand
         .selectAll("g.item")
         .classed("is-chained", (event) => highlight != null && highlight.has(event.id))
