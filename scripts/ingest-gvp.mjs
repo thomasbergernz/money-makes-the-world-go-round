@@ -86,7 +86,7 @@ for (const feature of features) {
   // An eruption already written up by hand keeps its curated entry, with its
   // curated wording and sources. Matching on name and year rather than on id
   // avoids hard-coding GVP volcano numbers into the curated files.
-  if (isCurated(name, year)) {
+  if (isCurated(name, year, row.EndDateYear ? Number(row.EndDateYear) : null)) {
     skipped.curated++;
     continue;
   }
@@ -202,7 +202,17 @@ function loadCurated() {
   if (!existsSync(path)) return [];
   return csvParse(readFileSync(path, "utf8"))
     .filter((row) => row.category === "nature")
-    .map((row) => [fold(row.label), Number(/(\d{1,6})/.exec(row.start)?.[1] ?? NaN)]);
+    .map((row) => {
+      const startYear = curatedYear(row.start);
+      const endYear = row.end ? curatedYear(row.end) : startYear;
+      return [fold(row.label), startYear, endYear];
+    });
+}
+
+/** The signed year a curated date column names; BC becomes negative. */
+function curatedYear(text) {
+  const year = Number(/(\d{1,6})/.exec(text)?.[1] ?? NaN);
+  return /\bBC\b/.test(text) ? -year : year;
 }
 
 /** Lowercase and strip diacritics, so "Eldgjá" matches GVP's "Eldgja". */
@@ -210,9 +220,15 @@ function fold(text) {
   return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
-function isCurated(name, startYear) {
+function isCurated(name, startYear, endYear) {
+  // Span overlap, not start-year equality: GVP dates Tambora's eruptive phase
+  // from 1812 while the curated entry starts at the 1815 paroxysm, and an
+  // exact-year match let that near-duplicate through.
   const needle = fold(name);
-  return curated.some(([label, year]) => year === Math.abs(startYear) && label.includes(needle));
+  const to = endYear ?? startYear;
+  return curated.some(
+    ([label, from, until]) => startYear <= until && to >= from && label.includes(needle),
+  );
 }
 
 /**

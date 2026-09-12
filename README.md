@@ -63,7 +63,7 @@ Six curated datasets live in `public/data/`, one per domain, all sharing one
 schema:
 
 ```
-id,start,end,label,category,region,certainty,uncertainty,source,link
+id,start,end,label,category,region,certainty,uncertainty,source,link,follows
 ```
 
 - `start` accepts `1815`, `1815 BC`, `1815-04`, or `1815-04-10`. A bare `-1815`
@@ -81,6 +81,13 @@ id,start,end,label,category,region,certainty,uncertainty,source,link
 - `region` is a closed enum: `GLOBAL`, `EUROPE`, `MIDDLE_EAST`, `AFRICA`,
   `ASIA_EAST`, `ASIA_SOUTH`, `AMERICAS`, `OCEANIA`.
 - `category` is `nature`, `economy`, `politics`, `science`, `religion` or `thought`.
+- `follows` is optional: semicolon-separated ids of events this one is
+  documented or argued to follow — Tambora, the Year Without a Summer, the
+  fodder crisis, Drais's Laufmaschine. It reads "follows", not "caused by":
+  the strength of the claim lives in `source`. Targets must exist in the
+  curated datasets (never in a bulk layer, which can be toggled off); the test
+  suite enforces both. The cursor panel shows the links in both directions,
+  and the Ask digest carries them at every degradation rung.
 
 `npm test` validates every shipped CSV against the schema, so a malformed row is
 a failing test rather than a blank lane.
@@ -96,7 +103,7 @@ npm run ingest:gvp                        # fetch from the GVP web service
 npm run ingest:gvp -- saved-response.json # or replay a saved response
 ```
 
-A run over the full catalogue (11,089 eruptions) yields **592 events**: only
+A run over the full catalogue (11,089 eruptions) yields **591 events**: only
 confirmed eruptions, only VEI 4 and above — below that an eruption has no
 plausible climate or economic signature — and only back to 3500 BC, so the layer
 cannot stretch the axis into prehistory.
