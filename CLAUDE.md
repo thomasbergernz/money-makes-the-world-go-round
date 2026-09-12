@@ -119,6 +119,14 @@ browser.
 - **The Ask tab makes no network calls.** No API key, no backend, no requests.
   If that ever changes, the panel's copy has to change with it — it currently
   promises the page sends nothing.
+- **`follows` links resolve inside the curated corpus.** The optional
+  `follows` column names events an event is documented to follow. Targets must
+  be curated ids — never `gvp-*`, because bulk layers toggle off and the link
+  would dangle — and `test/data.test.js` enforces it. At runtime
+  `src/data/links.js` skips unresolved targets silently rather than crashing.
+  The wording everywhere is "follows", never "caused by". Links are
+  chronologically monotonic — a follower never starts before its target, at
+  year granularity — also test-enforced.
 - **Curated events win id collisions.** `dedupeById` is first-wins and curated
   datasets load first, so a bulk layer can never double a hand-curated event.
   `ingest-gvp.mjs` also skips eruptions already present in `nature.csv`, matched
@@ -163,7 +171,10 @@ The checks worth running against a deploy:
 - the brush rescales every lane together and the selection rect agrees with the
   detail band after a window resize
 - a filter toggle re-packs lanes and empty regions collapse to labelled strips
-- the time cursor at 1816 lists Tambora's consequences across several lanes
+- the time cursor at 1816 lists Tambora's consequences across several lanes,
+  with "follows" lines walked to the end of each chain — Drais's Laufmaschine
+  reads back through the fodder crisis and the Year Without a Summer to
+  Tambora — and hovering a linked event dims every lane item off its chain
 - the GVP chip loads the bulk layer without duplicating curated Tambora
 - the Ask tab produces a prompt containing the grounding preamble
 

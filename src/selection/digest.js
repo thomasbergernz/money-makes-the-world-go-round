@@ -41,9 +41,9 @@ Identify what is missing — events significant enough to belong here that the s
 
 Return your suggestions as CSV rows in exactly this schema, ready to paste into the dataset:
 
-id,start,end,label,category,region,certainty,uncertainty,source,link
+id,start,end,label,category,region,certainty,uncertainty,source,link,follows
 
-Rules for those rows: id is a lowercase hyphenated slug, unique. start and end accept "1815", "1815 BC", "1815-04" or "1815-04-10"; a bare negative year is rejected, so spell out the era. An empty end means the event is an instant. certainty is exact, year, approx or contested; contested requires a non-zero uncertainty in years. Use only the category and region values listed above.`,
+Rules for those rows: id is a lowercase hyphenated slug, unique. start and end accept "1815", "1815 BC", "1815-04" or "1815-04-10"; a bare negative year is rejected, so spell out the era. An empty end means the event is an instant. certainty is exact, year, approx or contested; contested requires a non-zero uncertainty in years. Use only the category and region values listed above. follows is optional: it may name the id of another row in this same response (semicolon-separated for several), or be left empty — the event listing above shows labels, not ids, so do not guess ids for existing events.`,
   },
   narrative: {
     label: "Draft a narrative",
@@ -108,7 +108,8 @@ const RUNGS = [
 
 function render(selection, preset, question, rung) {
   const groups = groupByRegion(selection);
-  const { lines, includedCount } = renderGroups(groups, rung);
+  const byId = new Map(selection.events.map((event) => [event.id, event]));
+  const { lines, includedCount } = renderGroups(groups, rung, byId);
 
   const parts = [
     preset.instruction,
@@ -132,7 +133,7 @@ function render(selection, preset, question, rung) {
   };
 }
 
-function renderGroups(groups, rung) {
+function renderGroups(groups, rung, byId) {
   const lines = [];
   let includedCount = 0;
 
@@ -147,7 +148,7 @@ function renderGroups(groups, rung) {
     );
 
     for (const event of ordered(kept)) {
-      lines.push(renderEvent(event, rung));
+      lines.push(renderEvent(event, rung, byId));
       includedCount++;
     }
     lines.push("");
@@ -203,15 +204,25 @@ function longestFirst(events) {
   });
 }
 
-function renderEvent(event, rung) {
+function renderEvent(event, rung, byId) {
   const dates = formatEventRange(event);
+
+  // Curated links survive every rung. Cross-domain chains are the reason the
+  // tool exists, so dropping them to save space would gut the prompt. A target
+  // outside the selection falls back to its id, which is a readable slug.
+  const followsText = event.follows?.length
+    ? `follows: ${event.follows.map((id) => byId?.get(id)?.label ?? id).join("; ")}`
+    : "";
 
   // The domain tag is present at every rung, in the same machine-readable
   // form. It is how a reader — or a test — can tell that no domain was quietly
   // lost when the listing was shortened.
-  if (rung >= 2) return `- ${event.label} (${dates}) [${event.category}]`;
+  if (rung >= 2) {
+    return `- ${event.label} (${dates}) [${event.category}]${followsText ? ` (${followsText})` : ""}`;
+  }
 
   const bits = [`- ${event.label}`, dates, `[${event.category}] ${CATEGORY_LABELS[event.category]}`];
+  if (followsText) bits.push(followsText);
   if (isUncertain(event)) {
     bits.push(event.uncertainty > 0 ? `date uncertain ±${event.uncertainty}y` : "date approximate");
   }
@@ -237,7 +248,9 @@ Domains: ${Object.entries(CATEGORY_LABELS)
     .map(([key, label]) => `${label} (${key})`)
     .join(", ")}.
 
-Dates carry their own precision. An event shown as "c. 1610 BC" is contested and the stated uncertainty is in years — do not build an argument on a tight coincidence between two uncertain dates. An event with a single date is an instant; one with two spans that whole range.`;
+Dates carry their own precision. An event shown as "c. 1610 BC" is contested and the stated uncertainty is in years — do not build an argument on a tight coincidence between two uncertain dates. An event with a single date is an instant; one with two spans that whole range.
+
+Some events carry an explicit "follows:" note naming the events they are documented or argued to follow. These are curated links — causal or contributing, not mere coincidence — but their strength varies; treat them as claims with a named source, not as settled fact.`;
 }
 
 function header(selection, rung, includedCount) {

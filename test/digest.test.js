@@ -50,6 +50,23 @@ function bigSelection(perRegion = 40) {
 }
 
 describe("buildPrompt", () => {
+  it("carries follows links at every rung, by label when the target is in range", () => {
+    const cause = event({ id: "tambora", label: "Tambora" });
+    const effect = event({ id: "cold-summer", label: "Cold summer", follows: "tambora" });
+    const selection = selectionOf([cause, effect]);
+
+    for (let rung = 0; rung < RUNG_COUNT; rung++) {
+      const { text } = buildPrompt(selection, { rung });
+      expect(text, `rung ${rung}`).toContain("follows: Tambora");
+    }
+  });
+
+  it("falls back to the id when a follows target is outside the selection", () => {
+    const effect = event({ id: "cold-summer", label: "Cold summer", follows: "tambora" });
+    const { text } = buildPrompt(selectionOf([effect]));
+    expect(text).toContain("follows: tambora");
+  });
+
   it("includes the grounding preamble in every purpose", () => {
     for (const purpose of Object.keys(PURPOSES)) {
       const { text } = buildPrompt(selectionOf([event({ id: "a" })]), { purpose });

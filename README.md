@@ -85,9 +85,11 @@ id,start,end,label,category,region,certainty,uncertainty,source,link,follows
   documented or argued to follow — Tambora, the Year Without a Summer, the
   fodder crisis, Drais's Laufmaschine. It reads "follows", not "caused by":
   the strength of the claim lives in `source`. Targets must exist in the
-  curated datasets (never in a bulk layer, which can be toggled off); the test
-  suite enforces both. The cursor panel shows the links in both directions,
-  and the Ask digest carries them at every degradation rung.
+  curated datasets (never in a bulk layer, which can be toggled off), and a
+  follower may not start before its target; the test suite enforces all of it.
+  The cursor panel walks each chain to its end in both directions, hovering a
+  linked event dims everything off its chain, and the Ask digest carries the
+  links at every degradation rung.
 
 `npm test` validates every shipped CSV against the schema, so a malformed row is
 a failing test rather than a blank lane.

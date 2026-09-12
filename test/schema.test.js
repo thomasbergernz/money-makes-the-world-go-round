@@ -57,6 +57,17 @@ describe("normaliseRow", () => {
     }
   });
 
+  it("parses follows as a semicolon-separated id list, defaulting to empty", () => {
+    expect(normaliseRow(valid).follows).toEqual([]);
+    expect(normaliseRow({ ...valid, follows: "" }).follows).toEqual([]);
+    expect(normaliseRow({ ...valid, follows: "a-1; b-2" }).follows).toEqual(["a-1", "b-2"]);
+  });
+
+  it("rejects a malformed follows id and a self-reference", () => {
+    expect(() => normaliseRow({ ...valid, follows: "Bad Id" })).toThrow(/invalid follows id/i);
+    expect(() => normaliseRow({ ...valid, follows: "tambora-1815" })).toThrow(/cannot follow itself/i);
+  });
+
   it("rejects an end that precedes its start", () => {
     expect(() => normaliseRow({ ...valid, start: "1815", end: "1800" })).toThrow(/precedes/i);
   });

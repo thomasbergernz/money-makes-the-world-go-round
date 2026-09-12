@@ -78,6 +78,7 @@ class SchemaError extends Error {
  *   id: string, label: string, category: string, region: string,
  *   certainty: string, uncertainty: number, source: string, link: string,
  *   start: number, end: number|null, instant: boolean, dataset: string,
+ *   follows: string[],
  * }}
  */
 export function normaliseRow(row, where = {}) {
@@ -148,6 +149,22 @@ export function normaliseRow(row, where = {}) {
     }
   }
 
+  // Optional curated links: semicolon-separated ids of events this one
+  // follows. "Follows", not "caused by" — the link records a documented or
+  // argued connection, and the strength of the claim lives in the source
+  // column, not in the schema.
+  const followsText = text("follows");
+  const follows = [];
+  if (followsText !== "") {
+    for (const target of followsText.split(";").map((part) => part.trim())) {
+      if (!ID_PATTERN.test(target)) {
+        throw at(`Invalid follows id "${target}": use lowercase letters, digits and hyphens`);
+      }
+      if (target === id) throw at(`Event "${id}" cannot follow itself`);
+      follows.push(target);
+    }
+  }
+
   return {
     id,
     label: text("label"),
@@ -161,6 +178,7 @@ export function normaliseRow(row, where = {}) {
     end,
     instant: end === null,
     dataset: where.dataset ?? "",
+    follows,
   };
 }
 
