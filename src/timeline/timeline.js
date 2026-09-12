@@ -44,6 +44,8 @@ export function createTimeline(container, options = {}) {
   let lanes = [];
   let trackHeight = 12;
   let brushControl = null;
+  /** Ids of the hovered event's chain, or null when nothing is highlighted. */
+  let highlight = null;
 
   chart.resize();
 
@@ -120,6 +122,7 @@ export function createTimeline(container, options = {}) {
         lane.tracks,
         chart.mainScale,
         trackHeight,
+        { highlight },
       );
     });
   });
@@ -249,6 +252,21 @@ export function createTimeline(container, options = {}) {
       brushControl?.setDomain(domain);
       rebuildLanes();
       chart.redraw();
+    },
+
+    /**
+     * Dim everything outside the given chain. Null clears. Applied directly to
+     * the live items (no redraw); redraws reapply it from state via renderItems.
+     * Detail band only — the navigation band is a density picture, not a place
+     * to read a chain.
+     */
+    setHighlight(ids) {
+      if (ids === highlight || (ids == null && highlight == null)) return;
+      highlight = ids ?? null;
+      chart.mainBand
+        .selectAll("g.item")
+        .classed("is-chained", (event) => highlight != null && highlight.has(event.id))
+        .classed("is-dimmed", (event) => highlight != null && !highlight.has(event.id));
     },
 
     resize() {

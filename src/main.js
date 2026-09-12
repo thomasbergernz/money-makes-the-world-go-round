@@ -4,6 +4,7 @@ import "./styles.css";
 import { CORE_DATASETS, BULK_DATASETS, DATASETS } from "./data/manifest.js";
 import { loadDatasets } from "./data/load.js";
 import { dedupeById } from "./data/schema.js";
+import { buildLinkIndex } from "./data/links.js";
 import { createTimeline } from "./timeline/timeline.js";
 import { createFilters, applyFilters } from "./ui/filters.js";
 import { createPanel } from "./ui/panel.js";
@@ -37,11 +38,31 @@ async function boot() {
   let latestWindow = null;
   let filterState = null;
   let visibleCount = 0;
+  let linkIndex = buildLinkIndex([]);
+  let hoveredId = null;
+
+  /** The hovered event's whole chain as an id set, or null when it has none. */
+  function chainIds(event) {
+    if (!event) return null;
+    const up = linkIndex.chainUp(event.id);
+    const down = linkIndex.chainDown(event.id);
+    if (up.length === 0 && down.length === 0) return null;
+    return new Set([event.id, ...up.map((e) => e.id), ...down.map((e) => e.id)]);
+  }
 
   const timeline = createTimeline(timelineEl, {
     height: Math.max(420, window.innerHeight - 240),
     onCursor: (info) => panel.update(info),
-    onHover: (event, position) => tooltip.show(event, position),
+    onHover(event, position) {
+      tooltip.show(event, position);
+      // onHover fires per mousemove; only re-toggle classes when the hovered
+      // event actually changed.
+      const id = event?.id ?? null;
+      if (id !== hoveredId) {
+        hoveredId = id;
+        timeline.setHighlight(chainIds(event));
+      }
+    },
     onWindowChange(next) {
       latestWindow = next;
       publishSelection();
@@ -98,6 +119,8 @@ async function boot() {
       .flatMap(([, events]) => events);
     corpus = dedupeById([...core.events, ...bulkEvents]).sort((a, b) => a.start - b.start);
     timeline.setData(corpus);
+    linkIndex = buildLinkIndex(corpus);
+    panel.setEvents(corpus);
   }
 
   function refresh() {

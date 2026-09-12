@@ -72,7 +72,7 @@ function truncate(text, maxChars) {
  * @param {{labels?: boolean}} [options] navigation band renders without labels
  */
 export function renderItems(group, events, tracks, x, trackHeight, options = {}) {
-  const { labels = true } = options;
+  const { labels = true, highlight = null } = options;
   const itemHeight = Math.max(2, trackHeight - 2);
   const room = labels ? measureLabelRoom(events, tracks, x) : null;
 
@@ -93,6 +93,11 @@ export function renderItems(group, events, tracks, x, trackHeight, options = {})
     .attr("data-id", (event) => event.id)
     .classed("is-instant", (event) => event.instant)
     .classed("is-uncertain", isUncertain)
+    // Applied here, not as an external class toggle: the keyed join means an
+    // item entering on a brush-end redraw would otherwise miss the state, and
+    // hover does not re-fire without pointer movement.
+    .classed("is-chained", (event) => highlight != null && highlight.has(event.id))
+    .classed("is-dimmed", (event) => highlight != null && !highlight.has(event.id))
     .attr("transform", (event) => `translate(0,${tracks.get(event.id) * trackHeight})`);
 
   // The uncertainty halo: the range the date could actually be in. Drawn only

@@ -5,6 +5,7 @@ import { CATEGORY_COLORS } from "./theme.js";
 import { formatYear } from "../time/year.js";
 import { formatEventRange } from "../timeline/render.js";
 import { countAt } from "../timeline/cursor.js";
+import { buildLinkIndex } from "../data/links.js";
 
 export function createPanel(root) {
   root.innerHTML = `
@@ -18,7 +19,15 @@ export function createPanel(root) {
   const countEl = root.querySelector(".panel-count");
   const bodyEl = root.querySelector(".panel-body");
 
+  // Links resolve against the whole corpus, not just the events under the
+  // cursor — the event a chain points at is usually the one just outside the
+  // moment being inspected.
+  let links = buildLinkIndex([]);
+
   return {
+    setEvents(events) {
+      links = buildLinkIndex(events);
+    },
     update(info) {
       if (!info) {
         yearEl.textContent = "—";
@@ -60,6 +69,17 @@ export function createPanel(root) {
             range.textContent = formatEventRange(event);
 
             item.append(label, range);
+
+            // One line per direct neighbour, walked to the end of its branch
+            // (first parent per hop) so Drais reads back to Tambora, not just
+            // to the fodder crisis.
+            for (const target of links.follows(event.id)) {
+              item.append(linkLine("follows", branch(target, links.follows, event.id), " ← "));
+            }
+            for (const target of links.followedBy(event.id)) {
+              item.append(linkLine("followed by", branch(target, links.followedBy, event.id), " → "));
+            }
+
             list.append(item);
           }
           section.append(list);
@@ -68,4 +88,33 @@ export function createPanel(root) {
       );
     },
   };
+}
+
+const HOP_MAX_CHARS = 40;
+
+/** The labels along one branch, first parent per hop, cycle-guarded. */
+function branch(first, step, originId) {
+  const seen = new Set([originId, first.id]);
+  const labels = [hopLabel(first.label)];
+  let current = first;
+  for (;;) {
+    const next = step(current.id)[0];
+    if (!next || seen.has(next.id)) break;
+    seen.add(next.id);
+    labels.push(hopLabel(next.label));
+    current = next;
+  }
+  return labels;
+}
+
+function hopLabel(label) {
+  if (label.length <= HOP_MAX_CHARS) return label;
+  return `${label.slice(0, HOP_MAX_CHARS - 1)}…`;
+}
+
+function linkLine(relation, labels, joiner) {
+  const line = document.createElement("span");
+  line.className = "event-link-line";
+  line.textContent = `${relation === "follows" ? "↑" : "↓"} ${relation} ${labels.join(joiner)}`;
+  return line;
 }

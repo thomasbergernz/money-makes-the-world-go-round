@@ -363,6 +363,7 @@ body {
 
 .panel-region li {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 10px;
   padding: 3px 0 3px 9px;
@@ -373,6 +374,24 @@ body {
 .event-label {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+/* Chain highlight: hovering a linked event dims everything off its chain. */
+g.item.is-dimmed {
+  opacity: 0.25;
+}
+
+g.item.is-chained rect.body,
+g.item.is-chained circle.dot {
+  stroke: currentColor;
+  stroke-width: 1;
+}
+
+.event-link-line {
+  flex-basis: 100%;
+  margin-top: -2px;
+  color: var(--ink-faint);
+  font-size: 11px;
 }
 
 .event-range {
