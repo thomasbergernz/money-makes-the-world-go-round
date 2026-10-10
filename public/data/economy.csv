@@ -33,7 +33,7 @@ bullion-famine,1400,1470,Great Bullion Famine in Europe,economy,EUROPE,approx,15
 medici-bank,1397,1494,The Medici Bank,economy,EUROPE,year,,Medici archives,,
 eastern-alpine-mining-boom,1450,1600,Eastern Alpine silver lead and iron mining boom,economy,EUROPE,approx,25,Mining records; archaeology,,
 double-entry-bookkeeping,1494,,Pacioli codifies double-entry bookkeeping,economy,EUROPE,year,,Summa de arithmetica,,
-portuguese-spice-route,1498,,Sea route to India breaks the Venetian spice monopoly,economy,EUROPE,year,,Portuguese state records,,
+portuguese-spice-route,1498,,Sea route to India breaks the Venetian spice monopoly,economy,EUROPE,year,,Portuguese state records; Ottoman-blockade motive contested since Lybyer 1915,,ottoman-eastern-routes
 potosi-silver,1545,1810,Potosí silver floods world markets,economy,AMERICAS,year,,Spanish colonial mint records,,
 price-revolution,1520,1640,European Price Revolution,economy,EUROPE,approx,15,Wage and price series; central European silver impulse argued by Munro,,eastern-alpine-mining-boom
 manila-galleon,1565,1815,Manila galleon links American silver to China,economy,ASIA_EAST,year,,Spanish colonial records,,potosi-silver
@@ -100,9 +100,9 @@ grand-canal-china,605,609,Grand Canal links the Yellow and Yangtze rivers,econom
 trans-saharan-caravans,700,1600,Trans-Saharan gold and salt caravans,economy,AFRICA,approx,50,Arabic geographies; archaeology,,
 indian-ocean-dhow-trade,800,1500,Indian Ocean dhow trade and the Swahili coast,economy,AFRICA,approx,50,Arabic sources; archaeology,,
 song-maritime-trade,960,1279,Song maritime trade and the porcelain route,economy,ASIA_EAST,year,,Song dynastic records,,
-venetian-maritime-empire,1204,1797,Venetian maritime trading empire,economy,EUROPE,year,,Venetian state archives,,
+venetian-maritime-empire,1204,1797,Venetian maritime trading empire,economy,EUROPE,year,,Venetian state archives,,sack-of-constantinople-1204
 hanseatic-league,1356,1669,Hanseatic League,economy,EUROPE,year,,Hanseatic diet records,,
-ottoman-eastern-routes,1453,1550,Ottoman control of the eastern Mediterranean routes,economy,MIDDLE_EAST,approx,15,Ottoman and Venetian records,,
+ottoman-eastern-routes,1453,1550,Ottoman control of the eastern Mediterranean routes,economy,MIDDLE_EAST,approx,15,Ottoman and Venetian records,,fall-of-constantinople
 silk-road-decline,1400,1500,Overland Silk Road gives way to sea routes,economy,ASIA_EAST,approx,30,Travellers' accounts; customs records,,
 atlantic-triangular-trade,1526,1867,Atlantic triangular trade,economy,GLOBAL,year,,Trans-Atlantic Slave Trade Database,,
 english-east-india-company,1600,1874,English East India Company,economy,ASIA_SOUTH,year,,Company archives,,
@@ -128,3 +128,5 @@ daric-gold-coinage,515 BC,330 BC,Darius issues the gold daric and silver siglos,
 persian-royal-road,500 BC,330 BC,Achaemenid Royal Road links Sardis to Susa,economy,MIDDLE_EAST,approx,25,Herodotus; Persepolis administrative tablets,,
 ptolemaic-grain-monopoly,305 BC,30 BC,Ptolemaic royal grain monopoly and banking system,economy,AFRICA,year,,Ptolemaic papyri,,
 qin-currency-standardisation,221 BC,,Qin standardises weights measures and the ban liang coin,economy,ASIA_EAST,year,,Qin administrative records; Shiji,,
+silkworm-smuggling,552,,Silkworm eggs smuggled to Constantinople; Chinese silk monopoly broken,economy,MIDDLE_EAST,approx,5,Procopius,https://en.wikipedia.org/wiki/Smuggling_of_silkworm_eggs_into_the_Byzantine_Empire,
+solidus-debasement,1040,1092,Debasement of the solidus ends seven centuries of stable gold coin,economy,MIDDLE_EAST,approx,5,Numismatic evidence; Alexios I's 1092 coinage reform,https://en.wikipedia.org/wiki/Solidus_(coin),solidus-introduced

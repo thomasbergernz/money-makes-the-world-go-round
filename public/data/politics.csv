@@ -36,7 +36,7 @@ fall-of-western-rome,476-09-04,,Deposition of the last western Roman emperor,pol
 justinian-reconquest,533,554,Justinian's reconquest of the west,politics,EUROPE,year,,Procopius,,
 gupta-empire,320,550,Gupta Empire,politics,ASIA_SOUTH,approx,15,Inscriptions,,
 tang-dynasty,618,907,Tang dynasty,politics,ASIA_EAST,year,,Chinese annals,,
-arab-conquests,632,750,Early Arab conquests,politics,MIDDLE_EAST,year,,Arabic chronicles,,
+arab-conquests,632,750,Early Arab conquests,politics,MIDDLE_EAST,year,,Arabic chronicles,,byzantine-sasanian-war
 abbasid-caliphate,750,1258,Abbasid Caliphate,politics,MIDDLE_EAST,year,,Arabic chronicles,,
 carolingian-empire,800-12-25,888,Carolingian Empire,politics,EUROPE,year,,Frankish annals,,
 viking-age,793,1066,Viking Age,politics,EUROPE,year,,Anglo-Saxon Chronicle; sagas,,
@@ -44,7 +44,7 @@ march-of-tuscany,846,1197,March of Tuscany governed from Lucca,politics,EUROPE,a
 song-dynasty,960,1279,Song dynasty,politics,ASIA_EAST,year,,Chinese annals,,
 bamberg-carinthia-grant,1007,,Henry II grants Villach and the Canal Valley to Bamberg,politics,EUROPE,year,,Imperial charters,,
 norman-conquest,1066-10-14,,Norman conquest of England,politics,EUROPE,exact,,Anglo-Saxon Chronicle,,
-first-crusade,1096,1099,First Crusade,politics,MIDDLE_EAST,year,,Crusader chronicles,,
+first-crusade,1096,1099,First Crusade,politics,MIDDLE_EAST,year,,Crusader chronicles,,manzikert
 county-of-gorizia,1117,1500,County of Gorizia spans Friuli Carinthia and the Puster valley,politics,EUROPE,approx,10,Imperial charters,,
 magna-carta,1215-06-15,,Magna Carta,politics,EUROPE,exact,,Charter text,,
 mongol-conquests,1206,1294,Mongol conquests,politics,ASIA_EAST,year,,Secret History; Persian chronicles,,
@@ -167,3 +167,8 @@ monte-alban-zapotec-state,500 BC,800,Monte Alban and the Zapotec state,politics,
 roman-conquest-of-italy,343 BC,264 BC,Rome subdues the Italian peninsula,politics,EUROPE,year,,Livy; Roman annalists,,
 wars-of-the-diadochi,322 BC,275 BC,Wars of the Diadochi partition Alexander's empire,politics,MIDDLE_EAST,year,,Diodorus Siculus; Hellenistic sources,,
 seleucid-maurya-treaty,303 BC,,Seleucus cedes the eastern satrapies to Chandragupta,politics,ASIA_SOUTH,approx,3,Greek and Indian accounts; Megasthenes fragments,,
+byzantine-empire,330,1453,Byzantine Empire,politics,MIDDLE_EAST,year,,Byzantine chronicles,https://en.wikipedia.org/wiki/Byzantine_Empire,constantinople-founded
+sack-of-constantinople-1204,1204-04-13,,Fourth Crusade sacks Constantinople,politics,MIDDLE_EAST,exact,,Niketas Choniates; Villehardouin,https://en.wikipedia.org/wiki/Sack_of_Constantinople,
+byzantine-sasanian-war,602,628,Last Byzantine–Sasanian war exhausts both empires,politics,MIDDLE_EAST,year,,Theophanes; Sebeos,https://en.wikipedia.org/wiki/Byzantine–Sasanian_War_of_602–628,
+manzikert,1071-08-26,,Battle of Manzikert opens Anatolia to the Seljuks,politics,MIDDLE_EAST,exact,,Attaleiates; Anna Komnene,https://en.wikipedia.org/wiki/Battle_of_Manzikert,turkic-migrations
+siege-of-constantinople-717,717-08-15,718-08-15,Arab siege of Constantinople fails,politics,MIDDLE_EAST,exact,,Theophanes; Arabic chronicles,https://en.wikipedia.org/wiki/Siege_of_Constantinople_(717–718),arab-conquests

@@ -105,7 +105,7 @@ npm run ingest:gvp                        # fetch from the GVP web service
 npm run ingest:gvp -- saved-response.json # or replay a saved response
 ```
 
-A run over the full catalogue (11,089 eruptions) yields **591 events**: only
+A run over the full catalogue (11,089 eruptions) yields **590 events**: only
 confirmed eruptions, only VEI 4 and above — below that an eruption has no
 plausible climate or economic signature — and only back to 3500 BC, so the layer
 cannot stretch the axis into prehistory.
