@@ -82,7 +82,7 @@ horn-of-africa-drought-2011,2011,2012,Horn of Africa drought and famine,nature,A
 syria-drought-2006,2006,2010,Eastern Mediterranean drought,nature,MIDDLE_EAST,year,,NOAA; UN records,,
 australian-bushfires-2019,2019-09,2020-03,Australian Black Summer bushfires,nature,OCEANIA,year,,Australian government inquiry,,
 hunga-tonga-eruption,2022-01-15,,Hunga Tonga–Hunga Haʻapai eruption,nature,OCEANIA,exact,,Smithsonian Global Volcanism Program,,
-warmest-year-2023,2023,2024,Warmest years in the instrumental record,nature,GLOBAL,year,,WMO,,
+warmest-year-2023,2023,2024,Warmest years in the instrumental record,nature,GLOBAL,year,,WMO,,el-nino-2023
 assyrian-megadrought,675 BC,550 BC,Assyrian megadrought,nature,MIDDLE_EAST,approx,25,Speleothem records; Assyrian annals,,
 roman-north-africa-pluvial,100 BC,300,Wetter North Africa sustains Roman grain exports,nature,AFRICA,approx,50,Paleoclimate proxy records,,
 nile-failures-roman,155,299,Repeated Nile flood failures,nature,AFRICA,approx,20,Nilometer and papyrus records,,
@@ -135,3 +135,8 @@ global-coral-bleaching-1998,1998,,First global coral bleaching event,nature,GLOB
 global-coral-bleaching-2014,2014,2017,Third global coral bleaching event,nature,GLOBAL,year,,NOAA Coral Reef Watch,,
 yellow-river-floods,11,,Yellow River floods and course change,nature,ASIA_EAST,approx,6,Book of Han,https://en.wikipedia.org/wiki/Yellow_River#Flooding,
 santorini-eruption-726,726,,Santorini eruption,nature,EUROPE,year,,Theophanes; Nikephoros; Global Volcanism Program,https://en.wikipedia.org/wiki/Santorini,
+el-nino-2015,2015,2016,Very strong El Niño (2015–16),nature,GLOBAL,year,,NOAA,https://en.wikipedia.org/wiki/2014%E2%80%932016_El_Ni%C3%B1o_event,
+southern-africa-drought-2015,2015,2016,El Niño drought halves the South African maize harvest,nature,AFRICA,year,,FAO; South African crop estimates,https://en.wikipedia.org/wiki/2014%E2%80%932016_El_Ni%C3%B1o_event,el-nino-2015
+el-nino-2023,2023,2024,Strong El Niño (2023–24),nature,GLOBAL,year,,NOAA; WMO,https://en.wikipedia.org/wiki/2023%E2%80%932024_El_Ni%C3%B1o_event,
+el-nino-2026,2026,,Record-strength El Niño develops,nature,GLOBAL,year,,Süddeutsche Zeitung; NOAA,https://www.sueddeutsche.de/projekte/artikel/wissen/klima-el-ni-o-wetter-welt-duerre-dauerregen-atacama-e016282/,
+indonesian-fires-1997,1997,1998,El Niño drought and land clearing fuel Indonesian haze fires,nature,ASIA_SOUTH,year,,ASEAN haze records,https://en.wikipedia.org/wiki/1997_Southeast_Asian_haze,el-nino-1997;southeast-asian-deforestation

@@ -125,7 +125,7 @@ guest-worker-migration,1955,1973,Guest-worker migration to western Europe,politi
 syrian-refugee-crisis,2011,2019,Syrian refugee crisis,politics,MIDDLE_EAST,year,,UNHCR,,
 venezuelan-migration-crisis,2015,,Venezuelan migration crisis,politics,AMERICAS,year,,UNHCR; IOM,,
 cites-treaty,1975-07-01,,CITES enters into force,politics,GLOBAL,exact,,Treaty text,,
-montreal-protocol,1989-01-01,,Montreal Protocol enters into force,politics,GLOBAL,exact,,Treaty text,,
+montreal-protocol,1989-01-01,,Montreal Protocol enters into force,politics,GLOBAL,exact,,Treaty text,,molina-rowland-cfc;ozone-hole-identified
 sulla-sacks-athens,86 BC,,Sulla sacks Athens,politics,EUROPE,year,,Plutarch; Appian,https://en.wikipedia.org/wiki/Siege_of_Athens_and_Piraeus_(87%E2%80%9386_BC),
 caesar-conquers-gaul,58 BC,50 BC,Caesar's conquest of Gaul,politics,EUROPE,year,,Caesar's Commentarii de Bello Gallico,https://en.wikipedia.org/wiki/Gallic_Wars,
 battle-of-actium,31 BC,,Battle of Actium,politics,EUROPE,year,,Plutarch; Cassius Dio,https://en.wikipedia.org/wiki/Battle_of_Actium,
@@ -172,3 +172,4 @@ sack-of-constantinople-1204,1204-04-13,,Fourth Crusade sacks Constantinople,poli
 byzantine-sasanian-war,602,628,Last Byzantine–Sasanian war exhausts both empires,politics,MIDDLE_EAST,year,,Theophanes; Sebeos,https://en.wikipedia.org/wiki/Byzantine–Sasanian_War_of_602–628,
 manzikert,1071-08-26,,Battle of Manzikert opens Anatolia to the Seljuks,politics,MIDDLE_EAST,exact,,Attaleiates; Anna Komnene,https://en.wikipedia.org/wiki/Battle_of_Manzikert,turkic-migrations
 siege-of-constantinople-717,717-08-15,718-08-15,Arab siege of Constantinople fails,politics,MIDDLE_EAST,exact,,Theophanes; Arabic chronicles,https://en.wikipedia.org/wiki/Siege_of_Constantinople_(717–718),arab-conquests
+crimean-war,1853-10,1856-03-30,Crimean War,politics,EUROPE,year,,Treaty of Paris; British and Russian records,https://en.wikipedia.org/wiki/Crimean_War,

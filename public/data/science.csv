@@ -88,3 +88,14 @@ cook-voyages,1768,1779,Cook's Pacific voyages,science,OCEANIA,year,,Admiralty re
 keeling-curve,1958,,Keeling begins continuous atmospheric CO2 measurement,science,GLOBAL,year,,Mauna Loa Observatory records,https://en.wikipedia.org/wiki/Keeling_Curve,
 hagia-sophia,532,537,Hagia Sophia built; pendentive dome on an unprecedented span,science,MIDDLE_EAST,year,,"Procopius, Buildings",https://en.wikipedia.org/wiki/Hagia_Sophia,
 greek-fire,672,,Greek fire deployed by the Byzantine fleet,science,MIDDLE_EAST,approx,5,Theophanes,https://en.wikipedia.org/wiki/Greek_fire,
+carlowitz-sustainability,1713,,Carlowitz's Sylvicultura oeconomica founds sustained-yield forestry,science,EUROPE,year,,Primary text,https://en.wikipedia.org/wiki/Hans_Carl_von_Carlowitz,
+great-stink,1858-06,1858-08,The Great Stink paralyses London,science,EUROPE,year,,Parliamentary records,https://en.wikipedia.org/wiki/Great_Stink,
+london-sewers,1859,1875,Bazalgette's sewers end cholera in London,science,EUROPE,year,,Metropolitan Board of Works,https://en.wikipedia.org/wiki/London_sewer_system,great-stink
+molina-rowland-cfc,1974-06-28,,Molina and Rowland warn that CFCs destroy ozone,science,GLOBAL,exact,,Paper in Nature,https://en.wikipedia.org/wiki/Mario_Molina,
+ragusa-quarantine,1377,,Ragusa isolates arriving travellers for 30 days — the origin of quarantine,science,EUROPE,year,,Ragusa council decree,https://en.wikipedia.org/wiki/Quarantine,second-plague-pandemic
+brand-phosphorus,1669,,Hennig Brand discovers phosphorus while seeking the philosopher's stone,science,EUROPE,year,,Brand's correspondence,https://en.wikipedia.org/wiki/Hennig_Brand,
+lind-scurvy-trial,1747-05-20,,Lind's controlled trial on HMS Salisbury finds citrus cures scurvy,science,EUROPE,exact,,A Treatise of the Scurvy (1753),https://en.wikipedia.org/wiki/James_Lind,
+navy-lemon-juice,1795,,Royal Navy issues lemon juice fleet-wide against scurvy,science,EUROPE,year,,Admiralty records; Gilbert Blane,https://en.wikipedia.org/wiki/Scurvy,lind-scurvy-trial
+scutari-sanitary-reform,1854-11,1856-07,Nightingale at Scutari; Sanitary Commission repairs sewers and ventilation,science,MIDDLE_EAST,year,,Sanitary Commission report; National Army Museum,https://en.wikipedia.org/wiki/Florence_Nightingale,crimean-war
+lime-juice-scurvy-returns,1860,1876,Cheaper West Indian lime juice replaces lemon and scurvy returns,science,EUROPE,approx,5,US Naval Institute Proceedings (1965); Nares expedition reports,https://en.wikipedia.org/wiki/Scurvy,navy-lemon-juice
+vitamin-c-identified,1932,,Vitamin C identified as the antiscorbutic factor,science,GLOBAL,year,,Szent-Györgyi; King and Waugh,https://en.wikipedia.org/wiki/Vitamin_C,lime-juice-scurvy-returns
