@@ -26,6 +26,15 @@ const WFS_URL =
 
 const OUT = "public/data/gvp-volcanoes.csv";
 
+// Declared up here, not beside fetchWfs: the top-level await below runs
+// before anything declared after it is initialised.
+//
+// Retry only what a second attempt can fix: dropped connections and 5xx. A 4xx
+// means the request itself is wrong, and retrying it just hits the service
+// again for the same answer. The 2026-10 scheduled run died on a single
+// ECONNRESET that a retry minutes later would have survived.
+const RETRY_DELAYS_MS = [10_000, 30_000];
+
 // Only eruptions at or above this Volcanic Explosivity Index are worth a lane.
 // Below VEI 4 an eruption has no plausible climate or economic signature, and
 // the catalogue holds ~11,000 entries — including them would bury the events
@@ -162,12 +171,28 @@ function readLocal(path) {
 }
 
 async function fetchWfs() {
-  console.log(`Fetching ${WFS_URL}`);
-  const response = await fetch(WFS_URL);
-  if (!response.ok) {
-    throw new Error(`GVP request failed: ${response.status} ${response.statusText}`);
+  for (let attempt = 0; ; attempt++) {
+    console.log(`Fetching ${WFS_URL}${attempt ? ` (retry ${attempt})` : ""}`);
+    let response;
+    try {
+      response = await fetch(WFS_URL);
+    } catch (error) {
+      if (attempt >= RETRY_DELAYS_MS.length) throw error;
+      console.warn(`GVP fetch failed: ${error.cause?.code ?? error.message}`);
+      await sleep(RETRY_DELAYS_MS[attempt]);
+      continue;
+    }
+    if (response.ok) return (await response.json()).features;
+    if (response.status < 500 || attempt >= RETRY_DELAYS_MS.length) {
+      throw new Error(`GVP request failed: ${response.status} ${response.statusText}`);
+    }
+    console.warn(`GVP answered ${response.status} ${response.statusText}`);
+    await sleep(RETRY_DELAYS_MS[attempt]);
   }
-  return (await response.json()).features;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
